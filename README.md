@@ -5,6 +5,11 @@ It helps administrators and residents handle daily tasks like payments, maintena
 
 ---
 
+## Concept Paper Presentation
+https://www.canva.com/design/DAG-HUS51ik/v2qVfMTCK5hMk9eMDOm_GQ/view?utm_content=DAG-HUS51ik&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h4a1083b65b
+
+---
+
 ## Project Goal
 The goal of this project is to make community management simpler and more organized.  
 Instead of relying on multiple tools such as paper notices, chat applications, or spreadsheets, all essential tasks can be managed in one system.

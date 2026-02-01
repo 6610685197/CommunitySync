@@ -5,13 +5,18 @@ It helps administrators and residents handle daily tasks like payments, maintena
 
 ---
 
-## Concept Paper Presentation
+## Presentation
+- Concept Paper: </br>
 https://www.canva.com/design/DAG-HUS51ik/v2qVfMTCK5hMk9eMDOm_GQ/view?utm_content=DAG-HUS51ik&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h4a1083b65b
 
----
-
-## Requirements Presentation
+- Requirements: </br>
 https://www.canva.com/design/DAG-xkQ4m6U/Yt8tXu_8smLGwjGxdgd7gA/view?utm_content=DAG-xkQ4m6U&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=hdc8452a8a3
+
+- Class Diagram & Use Case Diagram: </br>
+https://www.canva.com/design/DAG_a7sKqwI/QwEKfDcEVnArt9FyxP7TMA/view?utm_content=DAG_a7sKqwI&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h2136b7eadc
+
+- GUI: </br>
+https://www.canva.com/design/DAHAG_V67dk/fxANwvrXrMlwq5FdAlIxeA/view?utm_content=DAHAG_V67dk&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h2b51a5388b
 
 ---
 

@@ -3,9 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>
+        User_Dashboard
+    </title>
+    <style>
+        ul li {
+            border-color: firebrick;
+            border: 2px solid;
+            width: fit-content;
+            padding: 5px;
+            margin: 2px;
+        }
+    </style>
 </head>
-<body>Hello, World!
-    
+<body>
+    <h1> Welcome back "Username" </h1>
+    <h4> Here’s your status today </h4>
+    <br>
+    <div style="background-color: rgb(133, 209, 248); width: fit-content; padding: 5px 20px;">
+    <p>Quick Actions</p>
+    <button>pay fees</button>
+    <button>report issue</button>
+    <button>visitors</button>
+    <button>announcement</button>
+    </div>
+
+    <!--will show loop of visitors-->
+    <div>
+        <h2> pending visitors <span> <button> "number" waiting > </button></span></h2>
+        <ul>
+            <li>Food Delivery - GrabFood 
+                <span>
+                    <button>Deny</button>  
+                    <button style="background-color: rgb(10, 243, 10);">Approve</button>
+                </span>
+            </li>
+            <li>Guest - Polthagorn Onthong
+                <span>
+                    <button>Deny</button>  
+                    <button style="background-color: rgb(10, 243, 10);">Approve</button>
+                </span>
+            </li>
+
+        </ul>
+    </div>
+    <br>
+    <!-- will show all activities: pays fee,reported issue,visitor acception and denial -->
+    <div>
+        <h2> recent activities </h2>
+        <ul>
+            <li>Monthly fee - 24/7/2026 <span style="background-color: limegreen; padding: 0 2px ;">paid</span>
+            </li>
+            <li>Air conditioning - fixing <span style="background-color: lightgray; padding: 0 2px ;">in progress</span>
+            </li>
+            <li>Guest - Polthagorn... <span style="background-color: limegreen; padding: 0 2px ;">accepted</span>
+            </li>
+        </ul>
+    </div>
 </body>
 </html>

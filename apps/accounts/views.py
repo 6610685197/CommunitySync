@@ -6,6 +6,10 @@ import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import CustomUser
+from .adapters import DiscordAdapter, GoogleAdapter
+from .utils import decode_jwt_without_verification
+from .services import OAuthFacade
+
 
 
 def login_view(request):
@@ -62,67 +66,19 @@ def resident_home(request):
 
 
 @csrf_exempt
-def discord_auth(request):
-    """Receive Supabase access token and create/login a local user.
-    
-    The frontend sends the token from a successful Supabase session.
-    We decode the JWT to extract user info (email, etc) without needing
-    to make another API call to Supabase.
-    """
-    if request.method != "POST":
-        return JsonResponse({"error": "POST required"}, status=405)
+def oauth_auth(request):
 
-    try:
-        data = json.loads(request.body)
-    except Exception as e:
-        return JsonResponse({"error": f"invalid JSON: {str(e)}"}, status=400)
-
+    data = json.loads(request.body)
     token = data.get("access_token")
-    if not token:
-        return JsonResponse({"error": "access_token required"}, status=400)
+    provider = data.get("provider")
 
-    try:
-        # Decode JWT parts without verification (we trust Supabase already verified it)
-        # JWT format: header.payload.signature
-        import base64
-        parts = token.split(".")
-        if len(parts) != 3:
-            return JsonResponse({"error": "invalid token format"}, status=400)
-        
-        # Decode the payload (add padding if needed)
-        payload_b64 = parts[1]
-        padding = 4 - (len(payload_b64) % 4)
-        if padding != 4:
-            payload_b64 += "=" * padding
-        
-        payload_json = base64.urlsafe_b64decode(payload_b64)
-        payload = json.loads(payload_json)
-        
-        # Extract email from the JWT payload
-        email = payload.get("email")
-        if not email:
-            return JsonResponse({"error": "email not in token"}, status=400)
-        
-        # Extract user name from payload (Discord usually provides this)
-        name = payload.get("name") or payload.get("email")
-        
-        # Find or create local user
-        user, created = CustomUser.objects.get_or_create(
-            email=email,
-            defaults={
-                "username": email.split("@")[0],
-                "name": name,
-                "role": "resident",  # default role
-            },
-        )
+    facade = OAuthFacade()
+    user = facade.authenticate(token, provider)
 
-        # Log the user in
-        user.backend = "django.contrib.auth.backends.ModelBackend"
-        login(request, user)
+    login(request, user)
 
-        return JsonResponse({"ok": True, "role": user.role})
-    except Exception as e:
-        return JsonResponse({"error": f"Token decode/processing error: {str(e)}"}, status=500)
+    return JsonResponse({"ok": True, "role": user.role})
+
 
 def index(request):
     """A simple landing page that redirects based on authentication status."""

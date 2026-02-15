@@ -90,7 +90,17 @@ WSGI_APPLICATION = "Community_Sync.wsgi.application"
 
 DATABASE_URL = os.getenv("DATABASE_URL")  # Read from .env
 
-DATABASES = {"default": dj_database_url.config(default=DATABASE_URL, conn_max_age=600)}
+# If a remote DATABASE_URL (e.g. Supabase/Postgres) is provided, use it.
+# Otherwise fall back to a local SQLite database for development.
+if DATABASE_URL:
+    DATABASES = {"default": dj_database_url.config(default=DATABASE_URL, conn_max_age=600)}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": str(BASE_DIR / "db.sqlite3"),
+        }
+    }
 
 
 # Custom User Model
@@ -138,3 +148,6 @@ STATIC_URL = "static/"
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "resident_home"  # Default fallback if custom logic fails
 LOGOUT_REDIRECT_URL = "login"
+
+# Supabase project URL (used to verify access tokens server-side)
+SUPABASE_URL = os.getenv("SUPABASE_URL", "https://rjxislnrsgmxfyvqwgfh.supabase.co")

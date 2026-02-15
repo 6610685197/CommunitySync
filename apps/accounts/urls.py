@@ -8,4 +8,5 @@ urlpatterns = [
     # Destination URLs
     path("dashboard/", views.admin_dashboard, name="admin_dashboard"),
     path("home/", views.resident_home, name="resident_home"),
+    path("", views.index, name="index"),
 ]

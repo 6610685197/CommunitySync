@@ -1,6 +1,25 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Resident Home</h1>
-<p>Welcome, {{ request.user.name }} — Resident view.</p>
+<div style="background:#fff7ed;border-left:6px solid #d97706;padding:16px;margin-bottom:12px;">
+	<h1 style="color:#b45309;margin:0;">Resident Home</h1>
+	<p style="margin:4px 0 0 0;color:#7c2d12">
+		Welcome back, <strong>{{ request.user.name }}</strong>.
+	</p>
+</div>
+
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+	<button style="background:#fef3c7;border:1px solid #fbbf24;padding:8px 12px;border-radius:6px;">Pay Fees</button>
+	<button style="background:#fee2e2;border:1px solid #f87171;padding:8px 12px;border-radius:6px;">Report Issue</button>
+	<button style="background:#e0f2fe;border:1px solid #60a5fa;padding:8px 12px;border-radius:6px;">Visitor Requests</button>
+	<button style="background:#ecfccb;border:1px solid #86efac;padding:8px 12px;border-radius:6px;">Announcements</button>
+</div>
+
+<section>
+	<h2 style="margin-top:0;color:#7c2d12">Recent Activity</h2>
+	<ul>
+		<li>Monthly fee paid — <small>24/7/2026</small></li>
+		<li>AC maintenance scheduled — <small>in progress</small></li>
+	</ul>
+</section>
 {% endblock %}

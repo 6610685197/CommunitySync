@@ -1,19 +1,121 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /> <title>CommunitySync Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CommunitySync Login</title>
+
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   </head>
+
   <body>
-    <div style="text-align: center; margin-top: 50px;">
+    <div style="text-align: center; margin-top: 50px">
       <h2>CommunitySync Login</h2>
+
+      <!-- Normal Django Login -->
       <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
+        {% csrf_token %} {{ form.as_p }}
         <button type="submit">Login</button>
       </form>
+
       {% if error %}
-        <p style="color: red;">{{ error }}</p>
+      <p style="color: red">{{ error }}</p>
       {% endif %}
+
+      <hr />
+
+      <!-- Discord Login -->
+      <button onclick="loginWithDiscord()">Login with Discord</button>
     </div>
+
+    <script>
+      const SUPABASE_URL = "https://rjxislnrsgmxfyvqwgfh.supabase.co";
+      const SUPABASE_KEY = "sb_publishable_o6Na_xY_hTMB7Ald1lTw2w_d52XQw7S";
+
+      const { createClient } = supabase;
+
+      // ✅ Important: enable automatic session detection
+      const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY, {
+        auth: {
+          detectSessionInUrl: true,
+          persistSession: true,
+        },
+      });
+
+      function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(";").shift();
+      }
+
+      async function loginWithDiscord() {
+        const { error } = await supabaseClient.auth.signInWithOAuth({
+          provider: "discord",
+          options: {
+            redirectTo: window.location.origin + "/login/",
+          },
+        });
+
+        if (error) {
+          console.error("OAuth error:", error);
+        }
+      }
+
+      async function checkSession() {
+        const {
+          data: { session },
+          error,
+        } = await supabaseClient.auth.getSession();
+
+        if (error) {
+          console.error("Session error:", error);
+          return;
+        }
+
+        if (!session) {
+          console.log("No session found");
+          return; // user not logged in
+        }
+
+        console.log("Session found, sending token to backend...");
+        try {
+          const resp = await fetch("/auth/discord/", {
+            method: "POST",
+            credentials: "same-origin",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": getCookie("csrftoken"),
+            },
+            body: JSON.stringify({
+              access_token: session.access_token,
+            }),
+          });
+
+          const result = await resp.json();
+          console.log("Backend response:", resp.status, result);
+
+          if (resp.ok) {
+            // Clean URL (remove ?code=...)
+            window.history.replaceState({}, document.title, "/login/");
+
+            if (result.role === "juristic") {
+              console.log("Redirecting to admin_dashboard...");
+              window.location.href = "/dashboard/";
+            } else {
+              console.log("Redirecting to resident_home...");
+              window.location.href = "/home/";
+            }
+          } else {
+            console.error("Server verification failed:", result.error);
+          }
+        } catch (err) {
+          console.error("Request failed:", err);
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        checkSession();
+      });
+    </script>
   </body>
 </html>

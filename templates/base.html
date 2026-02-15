@@ -17,7 +17,12 @@
     </style>
 </head>
 <body>
+    <div style="position:relative;">
     <h1> Welcome back "Username" </h1>
+    <div style="position:absolute; right:10px; top:10px;">
+        <a href="{% url 'logout' %}"><button>Logout</button></a>
+    </div>
+    </div>
     <h4> Here’s your status today </h4>
     <br>
     <div style="background-color: rgb(133, 209, 248); width: fit-content; padding: 5px 20px;">

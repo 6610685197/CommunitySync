@@ -123,3 +123,13 @@ def discord_auth(request):
         return JsonResponse({"ok": True, "role": user.role})
     except Exception as e:
         return JsonResponse({"error": f"Token decode/processing error: {str(e)}"}, status=500)
+
+def index(request):
+    """A simple landing page that redirects based on authentication status."""
+    if request.user.is_authenticated:
+        if request.user.role == "juristic":
+            return redirect("admin_dashboard")
+        else:
+            return redirect("resident_home")
+    else:
+        return redirect("login")

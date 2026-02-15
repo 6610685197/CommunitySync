@@ -1,69 +1,70 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>
-        User_Dashboard
-    </title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}CommunitySync{% endblock %}</title>
+
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .quick-actions button {
+            margin: 4px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+        }
+
         ul li {
-            border-color: firebrick;
-            border: 2px solid;
-            width: fit-content;
-            padding: 5px;
-            margin: 2px;
+            margin: 6px 0;
         }
     </style>
 </head>
+
 <body>
-    <div style="position:relative;">
-    <h1> Welcome back "Username" </h1>
-    <div style="position:absolute; right:10px; top:10px;">
-        <a href="{% url 'logout' %}"><button>Logout</button></a>
-    </div>
-    </div>
-    <h4> Here’s your status today </h4>
-    <br>
-    <div style="background-color: rgb(133, 209, 248); width: fit-content; padding: 5px 20px;">
-    <p>Quick Actions</p>
-    <button>pay fees</button>
-    <button>report issue</button>
-    <button>visitors</button>
-    <button>announcement</button>
+
+    <!-- Top Navigation -->
+    <div class="navbar">
+        <h2>CommunitySync</h2>
+
+        {% if request.user.is_authenticated %}
+            <div>
+                Welcome, <strong>{{ request.user.email }}</strong>
+                <button onclick="logoutUser()">Logout</button>
+            </div>
+        {% endif %}
     </div>
 
-    <!--will show loop of visitors-->
-    <div>
-        <h2> pending visitors <span> <button> "number" waiting > </button></span></h2>
-        <ul>
-            <li>Food Delivery - GrabFood 
-                <span>
-                    <button>Deny</button>  
-                    <button style="background-color: rgb(10, 243, 10);">Approve</button>
-                </span>
-            </li>
-            <li>Guest - Polthagorn Onthong
-                <span>
-                    <button>Deny</button>  
-                    <button style="background-color: rgb(10, 243, 10);">Approve</button>
-                </span>
-            </li>
+    <!-- Page Content -->
+    {% block content %}
+    {% endblock %}
 
-        </ul>
-    </div>
-    <br>
-    <!-- will show all activities: pays fee,reported issue,visitor acception and denial -->
-    <div>
-        <h2> recent activities </h2>
-        <ul>
-            <li>Monthly fee - 24/7/2026 <span style="background-color: limegreen; padding: 0 2px ;">paid</span>
-            </li>
-            <li>Air conditioning - fixing <span style="background-color: lightgray; padding: 0 2px ;">in progress</span>
-            </li>
-            <li>Guest - Polthagorn... <span style="background-color: limegreen; padding: 0 2px ;">accepted</span>
-            </li>
-        </ul>
-    </div>
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = "https://rjxislnrsgmxfyvqwgfh.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_o6Na_xY_hTMB7Ald1lTw2w_d52XQw7S";
+
+        const { createClient } = supabase;
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        async function logoutUser() {
+            await supabaseClient.auth.signOut();
+            window.location.href = "{% url 'logout' %}";
+        }
+    </script>
+
 </body>
 </html>

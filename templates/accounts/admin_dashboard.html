@@ -1,6 +1,32 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Admin Dashboard</h1>
-<p>Welcome, {{ request.user.name }} ({{ request.user.role }}).</p>
-{% endblock %}
+<div style="background:#f8f9fb;border-left:6px solid #2b6cb0;padding:16px;margin-bottom:12px;">
+	<h1 style="color:#2b6cb0;margin:0;">Admin Dashboard</h1>
+	<p style="margin:4px 0 0 0;color:#334155">Welcome, <strong>{{ request.user.name }}</strong> — <em>{{ request.user.role }}</em>.</p>
+</div>
+
+<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;">
+	<div style="background:#fff;border:1px solid #e6eef8;padding:12px;border-radius:6px;min-width:180px;">
+		<h3 style="margin:0 0 8px 0;color:#0f172a">Communities</h3>
+		<p style="margin:0;font-size:24px;color:#1e3a8a">12</p>
+	</div>
+	<div style="background:#fff;border:1px solid #fde68a;padding:12px;border-radius:6px;min-width:180px;">
+		<h3 style="margin:0 0 8px 0;color:#92400e">Pending Approvals</h3>
+		<p style="margin:0;font-size:24px;color:#b45309">3</p>
+	</div>
+	<div style="background:#fff;border:1px solid #c7f9cc;padding:12px;border-radius:6px;min-width:180px;">
+		<h3 style="margin:0 0 8px 0;color:#065f46">Active Residents</h3>
+		<p style="margin:0;font-size:24px;color:#047857">482</p>
+	</div>
+</div>
+
+<section>
+	<h2 style="margin-top:0;color:#0f172a">Admin Actions</h2>
+	<ul>
+		<li><a href="#">Manage Communities</a></li>
+		<li><a href="#">View Reports</a></li>
+		<li><a href="#">Approve Requests</a></li>
+	</ul>
+</section>
+{% endblock %} 

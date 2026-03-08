@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from .forms import LoginForm
+from .forms import LoginForm,CustomUserCreationForm
 import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -133,3 +133,34 @@ def index(request):
             return redirect("resident_home")
     else:
         return redirect("login")
+    
+@login_required
+def create_account(request):
+    # Only juristic can access this page
+    if request.user.role != "juristic":
+        return redirect("resident_home")
+
+    if request.method == "POST":
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("user_list")   # or user list page if you have one
+    else:
+        form = CustomUserCreationForm()
+
+    return render(request, "accounts/create_account.html", {"form": form})
+
+@login_required
+def user_list(request):
+
+    # Only juristic can access
+    if request.user.role != "juristic":
+        return redirect("resident_home")
+
+    users = CustomUser.objects.all().order_by("role", "username")
+
+    context = {
+        "users": users
+    }
+
+    return render(request, "accounts/user_list.html", context)

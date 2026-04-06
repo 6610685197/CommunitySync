@@ -12,7 +12,7 @@
     <div style="text-align: center; margin-top: 50px">
       <h2>CommunitySync Login</h2>
 
-      <!-- Normal Django Login -->
+      <!-- Django Login -->
       <form method="post">
         {% csrf_token %} {{ form.as_p }}
         <button type="submit">Login</button>
@@ -24,8 +24,11 @@
 
       <hr />
 
-      <!-- Discord Login -->
+      <!-- OAuth Login -->
       <button onclick="loginWithDiscord()">Login with Discord</button>
+      <br />
+      <br />
+      <button onclick="loginWithGoogle()">Login with Google</button>
     </div>
 
     <script>
@@ -34,7 +37,6 @@
 
       const { createClient } = supabase;
 
-      // ✅ Important: enable automatic session detection
       const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY, {
         auth: {
           detectSessionInUrl: true,
@@ -49,73 +51,69 @@
       }
 
       async function loginWithDiscord() {
-        const { error } = await supabaseClient.auth.signInWithOAuth({
+        await supabaseClient.auth.signInWithOAuth({
           provider: "discord",
           options: {
             redirectTo: window.location.origin + "/login/",
           },
         });
+      }
 
-        if (error) {
-          console.error("OAuth error:", error);
-        }
+      async function loginWithGoogle() {
+        await supabaseClient.auth.signInWithOAuth({
+          provider: "google",
+          options: {
+            redirectTo: window.location.origin + "/login/",
+          },
+        });
       }
 
       async function checkSession() {
-        const {
-          data: { session },
-          error,
-        } = await supabaseClient.auth.getSession();
+  console.log("Checking session...");
 
-        if (error) {
-          console.error("Session error:", error);
-          return;
-        }
+  await new Promise((resolve) => setTimeout(resolve, 500));
 
-        if (!session) {
-          console.log("No session found");
-          return; // user not logged in
-        }
+  const { data, error } = await supabaseClient.auth.getSession();
 
-        console.log("Session found, sending token to backend...");
-        try {
-          const resp = await fetch("/auth/discord/", {
-            method: "POST",
-            credentials: "same-origin",
-            headers: {
-              "Content-Type": "application/json",
-              "X-CSRFToken": getCookie("csrftoken"),
-            },
-            body: JSON.stringify({
-              access_token: session.access_token,
-            }),
-          });
+  console.log("Session response:", data, error);
 
-          const result = await resp.json();
-          console.log("Backend response:", resp.status, result);
+  if (!data || !data.session) {
+    console.log("No session detected");
+    return;
+  }
 
-          if (resp.ok) {
-            // Clean URL (remove ?code=...)
-            window.history.replaceState({}, document.title, "/login/");
+  const session = data.session;
+  console.log("Session found:", session);
 
-            if (result.role === "juristic") {
-              console.log("Redirecting to admin_dashboard...");
-              window.location.href = "/dashboard/";
-            } else {
-              console.log("Redirecting to resident_home...");
-              window.location.href = "/home/";
-            }
-          } else {
-            console.error("Server verification failed:", result.error);
-          }
-        } catch (err) {
-          console.error("Request failed:", err);
-        }
-      }
+  const resp = await fetch("/auth/oauth/", {
+    method: "POST",
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": getCookie("csrftoken"),
+    },
+    body: JSON.stringify({
+      access_token: session.access_token,
+      provider: session.user.app_metadata.provider,
+    }),
+  });
 
-      document.addEventListener("DOMContentLoaded", function () {
-        checkSession();
-      });
+  const result = await resp.json();
+  console.log("Backend result:", resp.status, result);
+
+  if (resp.ok) {
+    window.history.replaceState({}, document.title, "/login/");
+
+    if (result.role === "juristic") {
+      window.location.href = "/dashboard/";
+    } else {
+      window.location.href = "/home/";
+    }
+  }
+}
+
+
+      document.addEventListener("DOMContentLoaded", checkSession);
     </script>
   </body>
 </html>

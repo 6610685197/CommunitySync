@@ -41,7 +41,7 @@
 
         {% if request.user.is_authenticated %}
             <div>
-                Welcome, <strong>{{ request.user.email }}</strong>
+                Welcome, <strong>{{ request.user.name }}</strong>
                 <button onclick="logoutUser()">Logout</button>
             </div>
         {% endif %}

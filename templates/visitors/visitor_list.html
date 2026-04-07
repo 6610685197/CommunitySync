@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width:1100px;margin:20px auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <div>
+            <h1 style="margin:0;">Visitors</h1>
+            <p style="color:#555;margin:6px 0 0 0;">
+                {% if request.user.role == "security" %}
+                    Manage all visitor records
+                {% else %}
+                    View your own visitors only
+                {% endif %}
+            </p>
+        </div>
+
+        {% if request.user.role == "security" %}
+            <a href="{% url 'visitor_create' %}"
+               style="background:#2563eb;color:white;padding:10px 14px;border-radius:6px;text-decoration:none;">
+               + Add Visitor
+            </a>
+        {% endif %}
+    </div>
+
+    <div style="background:white;border:1px solid #ddd;border-radius:8px;overflow:hidden;">
+        <table style="width:100%;border-collapse:collapse;">
+            <thead style="background:#f8fafc;">
+                <tr>
+                    <th style="padding:12px;border-bottom:1px solid #ddd;text-align:left;">Name</th>
+                    <th style="padding:12px;border-bottom:1px solid #ddd;text-align:left;">Resident</th>
+                    <th style="padding:12px;border-bottom:1px solid #ddd;text-align:left;">Home No.</th>
+                    <th style="padding:12px;border-bottom:1px solid #ddd;text-align:left;">Plate</th>
+                    <th style="padding:12px;border-bottom:1px solid #ddd;text-align:left;">Status</th>
+                    <th style="padding:12px;border-bottom:1px solid #ddd;text-align:left;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for visitor in visitors %}
+                <tr>
+                    <td style="padding:12px;border-bottom:1px solid #eee;">{{ visitor.name }}</td>
+                    <td style="padding:12px;border-bottom:1px solid #eee;">
+                        {{ visitor.resident.name|default:visitor.resident.username }}
+                    </td>
+                    <td style="padding:12px;border-bottom:1px solid #eee;">{{ visitor.home_number }}</td>
+                    <td style="padding:12px;border-bottom:1px solid #eee;">{{ visitor.license_plate|default:"-" }}</td>
+                    <td style="padding:12px;border-bottom:1px solid #eee;">{{ visitor.get_status_display }}</td>
+                    <td style="padding:12px;border-bottom:1px solid #eee;">
+                        <a href="{% url 'visitor_detail' visitor.pk %}">View</a>
+                        {% if request.user.role == "security" %}
+                            | <a href="{% url 'visitor_update' visitor.pk %}">Edit</a>
+                            | <a href="{% url 'visitor_delete' visitor.pk %}">Delete</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="padding:16px;text-align:center;color:#666;">No visitors found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

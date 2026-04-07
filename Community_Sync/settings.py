@@ -143,6 +143,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = "static/"
+#media urls
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
 
 # Login Redirects
 LOGIN_URL = "login"
@@ -151,3 +154,4 @@ LOGOUT_REDIRECT_URL = "login"
 
 # Supabase project URL (used to verify access tokens server-side)
 SUPABASE_URL = os.getenv("SUPABASE_URL", "https://rjxislnrsgmxfyvqwgfh.supabase.co")
+

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width:900px;margin:20px auto;">
+    <div style="background:#fff;border:1px solid #ddd;border-radius:8px;padding:20px;">
+        <h1 style="margin-top:0;">{{ page_title }}</h1>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div style="margin-bottom:16px;">
+                {{ form.as_p }}
+            </div>
+
+            <hr>
+            <h3>Visitor Images (optional)</h3>
+
+            {{ formset.management_form }}
+            {% for image_form in formset %}
+                <div style="border:1px solid #ddd;padding:12px;border-radius:6px;margin-bottom:10px;background:#fafafa;">
+                    {{ image_form.as_p }}
+                </div>
+            {% endfor %}
+
+            <button type="submit" style="background:#2563eb;color:white;border:none;padding:10px 16px;border-radius:6px;">
+                Save
+            </button>
+            <a href="{% url 'visitor_list' %}" style="margin-left:10px;">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

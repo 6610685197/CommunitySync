@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width:900px;margin:20px auto;">
+    <div style="background:#fff;border:1px solid #ddd;border-radius:8px;padding:20px;">
+        <h1 style="margin-top:0;">Visitor Detail</h1>
+
+        <p><strong>Name:</strong> {{ visitor.name }}</p>
+        <p><strong>Visit Resident:</strong> {{ visitor.resident.name|default:visitor.resident.username }}</p>
+        <p><strong>Home Number:</strong> {{ visitor.home_number }}</p>
+        <p><strong>Address:</strong> {{ visitor.address|default:"-" }}</p>
+        <p><strong>License Plate:</strong> {{ visitor.license_plate|default:"-" }}</p>
+        <p><strong>Status:</strong> {{ visitor.get_status_display }}</p>
+        <p><strong>Visit Time:</strong> {{ visitor.visit_time|default:"-" }}</p>
+        <p><strong>Note:</strong> {{ visitor.note|default:"-" }}</p>
+        <p><strong>Created By:</strong> {{ visitor.created_by|default:"-" }}</p>
+        <p><strong>Created At:</strong> {{ visitor.created_at }}</p>
+
+        <hr>
+
+        <h3>Images</h3>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+            {% for img in visitor.images.all %}
+                <div style="border:1px solid #ddd;border-radius:6px;padding:8px;background:#fafafa;">
+                    <img src="{{ img.image.url }}" alt="visitor image" style="width:180px;height:180px;object-fit:cover;border-radius:6px;">
+                </div>
+            {% empty %}
+                <p>No images uploaded.</p>
+            {% endfor %}
+        </div>
+
+        <div style="margin-top:20px;">
+            <a href="{% url 'visitor_list' %}">Back</a>
+            {% if request.user.role == "security" %}
+                | <a href="{% url 'visitor_update' visitor.pk %}">Edit</a>
+                | <a href="{% url 'visitor_delete' visitor.pk %}">Delete</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

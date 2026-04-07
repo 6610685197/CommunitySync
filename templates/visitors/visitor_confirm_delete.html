@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width:600px;margin:20px auto;">
+    <div style="background:#fff;border:1px solid #ddd;border-radius:8px;padding:20px;">
+        <h1>Delete Visitor</h1>
+        <p>Are you sure you want to delete <strong>{{ visitor.name }}</strong>?</p>
+
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit" style="background:#dc2626;color:white;border:none;padding:10px 16px;border-radius:6px;">
+                Delete
+            </button>
+            <a href="{% url 'visitor_detail' visitor.pk %}" style="margin-left:10px;">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

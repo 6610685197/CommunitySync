@@ -9,7 +9,9 @@ from .models import CustomUser
 from .adapters import DiscordAdapter, GoogleAdapter
 from .utils import decode_jwt_without_verification
 from .services import OAuthFacade
-
+from django.utils import timezone
+from datetime import datetime, time
+from apps.visitors.models import Visitor
 
 
 def login_view(request):
@@ -25,10 +27,10 @@ def login_view(request):
                 # Redirect based on Role [cite: 106, 109]
                 if user.role == "juristic":
                     return redirect("admin_dashboard")
+                elif user.role == "security":
+                    return redirect("security_dashboard")
                 elif user.role == "resident":
                     return redirect("resident_home")
-                else:
-                    return redirect("resident_home")  # Default fallback
             else:
                 return render(
                     request,
@@ -52,7 +54,7 @@ def logout_view(request):
 @login_required
 def admin_dashboard(request):
     # This corresponds to the "Dashboard" for Juristic Person [cite: 5]
-    if request.user.role != "juristic":
+    if request.user.role not in ["juristic", "security"]:
         return redirect("resident_home")  # Prevent unauthorized access
     return render(request, "accounts/admin_dashboard.html")
 
@@ -120,3 +122,26 @@ def user_list(request):
     }
 
     return render(request, "accounts/user_list.html", context)
+
+@login_required
+def security_dashboard(request):
+    if request.user.role not in ["security", "juristic"]:
+        return redirect("login")
+
+    today = timezone.localdate()
+
+    visitors_today = Visitor.objects.filter(created_at__date=today).count()
+    expected_count = Visitor.objects.filter(status="expected").count()
+    arrived_count = Visitor.objects.filter(status="arrived").count()
+    completed_count = Visitor.objects.filter(status="completed").count()
+
+    recent_visitors = Visitor.objects.select_related("resident", "created_by").order_by("-created_at")[:10]
+
+    context = {
+        "visitors_today": visitors_today,
+        "expected_count": expected_count,
+        "arrived_count": arrived_count,
+        "completed_count": completed_count,
+        "recent_visitors": recent_visitors,
+    }
+    return render(request, "accounts/security_dashboard.html", context)

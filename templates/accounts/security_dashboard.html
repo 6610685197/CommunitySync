@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Security Dashboard{% endblock %}
+
+{% block content %}
+<div style="max-width: 1150px; margin: 30px auto; padding: 20px;">
+    <h1 style="margin-bottom: 8px;">Security Dashboard</h1>
+    <p style="color: #666; margin-bottom: 24px;">
+        Welcome, {{ request.user.name|default:request.user.username }}
+    </p>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px; margin-bottom:30px;">
+        <div style="background:#dbeafe; padding:20px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+            <h3 style="margin:0 0 8px 0;">Visitors Today</h3>
+            <p style="font-size:30px; font-weight:bold; margin:0;">{{ visitors_today }}</p>
+        </div>
+
+        <div style="background:#fef3c7; padding:20px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+            <h3 style="margin:0 0 8px 0;">Expected</h3>
+            <p style="font-size:30px; font-weight:bold; margin:0;">{{ expected_count }}</p>
+        </div>
+
+        <div style="background:#dcfce7; padding:20px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+            <h3 style="margin:0 0 8px 0;">Arrived</h3>
+            <p style="font-size:30px; font-weight:bold; margin:0;">{{ arrived_count }}</p>
+        </div>
+
+        <div style="background:#e9d5ff; padding:20px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+            <h3 style="margin:0 0 8px 0;">Completed</h3>
+            <p style="font-size:30px; font-weight:bold; margin:0;">{{ completed_count }}</p>
+        </div>
+    </div>
+
+    <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:28px;">
+        <a href="{% url 'visitor_list' %}" style="text-decoration:none; background:#2563eb; color:white; padding:10px 16px; border-radius:8px;">
+            View Visitors
+        </a>
+        <a href="{% url 'visitor_create' %}" style="text-decoration:none; background:#16a34a; color:white; padding:10px 16px; border-radius:8px;">
+            Add Visitor
+        </a>
+    </div>
+
+    <div style="background:white; border-radius:12px; padding:20px; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+        <h2 style="margin-top:0;">Recent Visitors</h2>
+
+        <div style="overflow-x:auto;">
+            <table style="width:100%; border-collapse:collapse;">
+                <thead>
+                    <tr style="background:#f3f4f6;">
+                        <th style="padding:12px; text-align:left;">Name</th>
+                        <th style="padding:12px; text-align:left;">License Plate</th>
+                        <th style="padding:12px; text-align:left;">Resident</th>
+                        <th style="padding:12px; text-align:left;">Home Number</th>
+                        <th style="padding:12px; text-align:left;">Visit Time</th>
+                        <th style="padding:12px; text-align:left;">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for visitor in recent_visitors %}
+                    <tr style="border-bottom:1px solid #e5e7eb;">
+                        <td style="padding:12px;">{{ visitor.name }}</td>
+                        <td style="padding:12px;">{{ visitor.license_plate|default:"-" }}</td>
+                        <td style="padding:12px;">{{ visitor.resident.name|default:visitor.resident.username }}</td>
+                        <td style="padding:12px;">{{ visitor.home_number }}</td>
+                        <td style="padding:12px;">
+                            {% if visitor.visit_time %}
+                                {{ visitor.visit_time|date:"d M Y H:i" }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td style="padding:12px;">
+                            {% if visitor.status == "expected" %}
+                                <span style="background:#fef3c7; color:#92400e; padding:4px 10px; border-radius:999px;">Expected</span>
+                            {% elif visitor.status == "arrived" %}
+                                <span style="background:#dcfce7; color:#166534; padding:4px 10px; border-radius:999px;">Arrived</span>
+                            {% elif visitor.status == "completed" %}
+                                <span style="background:#e9d5ff; color:#6b21a8; padding:4px 10px; border-radius:999px;">Completed</span>
+                            {% else %}
+                                <span style="background:#e5e7eb; color:#374151; padding:4px 10px; border-radius:999px;">{{ visitor.status }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" style="padding:16px; text-align:center; color:#666;">
+                            No visitor records found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

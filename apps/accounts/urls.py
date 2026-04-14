@@ -10,4 +10,5 @@ urlpatterns = [
     path("home/", views.resident_home, name="resident_home"),
     path("", views.index, name="index"),
     path("users/", views.user_list, name="user_list"),
+    path("security-dashboard/", views.security_dashboard, name="security_dashboard"),
 ]

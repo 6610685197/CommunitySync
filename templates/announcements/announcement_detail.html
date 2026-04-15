@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width:900px; margin:30px auto;">
+    <div style="background:#fff; border:1px solid #ddd; border-radius:10px; padding:24px;">
+        <h1 style="margin-top:0;">{{ announcement.title }}</h1>
+
+        <p style="color:#666;">
+            By {{ announcement.created_by.name|default:announcement.created_by.username|default:"-" }}
+            | {{ announcement.created_at|date:"d M Y H:i" }}
+        </p>
+
+        <hr style="margin:20px 0;">
+
+        <p style="white-space:pre-line;">{{ announcement.content }}</p>
+
+        <div style="margin-top:24px;">
+            <a href="{% url 'announcement_list' %}">Back</a>
+
+            {% if request.user.role == "juristic" %}
+                | <a href="{% url 'announcement_update' announcement.pk %}">Edit</a>
+                | <a href="{% url 'announcement_delete' announcement.pk %}">Delete</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

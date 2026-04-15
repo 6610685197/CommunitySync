@@ -25,5 +25,6 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("apps.accounts.urls")),  # Include URLs from accounts app
     path("visitors/", include("apps.visitors.urls")),
+    path("announcements/", include("apps.announcements.urls")),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

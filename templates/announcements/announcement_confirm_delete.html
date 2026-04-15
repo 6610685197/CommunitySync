@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width:700px; margin:30px auto;">
+    <div style="background:#fff; border:1px solid #ddd; border-radius:10px; padding:24px;">
+        <h1 style="margin-top:0;">Delete Announcement</h1>
+
+        <p>Are you sure you want to delete:</p>
+        <p><strong>{{ announcement.title }}</strong></p>
+
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit"
+                    style="background:#dc2626; color:white; border:none; padding:10px 16px; border-radius:8px; cursor:pointer;">
+                Yes, Delete
+            </button>
+            <a href="{% url 'announcement_detail' announcement.pk %}" style="margin-left:10px;">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

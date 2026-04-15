@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width:1000px; margin:30px auto;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h1 style="margin:0;">Announcements</h1>
+
+        {% if request.user.role == "juristic" %}
+            <a href="{% url 'announcement_create' %}"
+               style="background:#16a34a; color:white; text-decoration:none; padding:10px 16px; border-radius:8px;">
+                + Create Announcement
+            </a>
+        {% endif %}
+    </div>
+
+    {% for announcement in announcements %}
+        <div style="background:#fff; border:1px solid #ddd; border-radius:10px; padding:18px; margin-bottom:16px;">
+            <h2 style="margin-top:0;">
+                <a href="{% url 'announcement_detail' announcement.pk %}" style="text-decoration:none; color:#111;">
+                    {{ announcement.title }}
+                </a>
+            </h2>
+
+            <p style="color:#666; margin-bottom:12px;">
+                By {{ announcement.created_by.name|default:announcement.created_by.username|default:"-" }}
+                | {{ announcement.created_at|date:"d M Y H:i" }}
+            </p>
+
+            <p>
+                {{ announcement.content|truncatewords:30 }}
+            </p>
+
+            <a href="{% url 'announcement_detail' announcement.pk %}">Read more</a>
+
+            {% if request.user.role == "juristic" %}
+                | <a href="{% url 'announcement_update' announcement.pk %}">Edit</a>
+                | <a href="{% url 'announcement_delete' announcement.pk %}">Delete</a>
+            {% endif %}
+        </div>
+    {% empty %}
+        <div style="background:#fff; border:1px solid #ddd; border-radius:10px; padding:18px;">
+            No announcements yet.
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

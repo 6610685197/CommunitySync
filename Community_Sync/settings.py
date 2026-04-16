@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "apps.maintenance",
     "apps.payments",
     "apps.visitors",
+    
 ]
 
 MIDDLEWARE = [

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width:1000px;margin:30px auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <h1 style="margin:0;">Maintenance Requests</h1>
+        {% if request.user.role == "resident" or request.user.role == "juristic" %}
+            <a href="{% url 'maintenance_create' %}" style="background:#16a34a;color:white;text-decoration:none;padding:10px 16px;border-radius:8px;">
+                + Create Request
+            </a>
+        {% endif %}
+    </div>
+
+    {% for req in requests %}
+        <div style="background:#fff;border:1px solid #ddd;border-radius:10px;padding:18px;margin-bottom:16px;">
+            <h2 style="margin-top:0;">
+                <a href="{% url 'maintenance_detail' req.pk %}" style="text-decoration:none;color:#111;">
+                    {{ req.title }}
+                </a>
+            </h2>
+
+            <p style="color:#666;">
+                Type: {{ req.get_request_type_display }} |
+                Status: {{ req.get_status_display }} |
+                Resident:
+                {% if req.resident %}
+                    {{ req.resident.name|default:req.resident.username }}
+                {% else %}
+                    -
+                {% endif %}
+            </p>
+
+            <p>{{ req.description|truncatewords:25 }}</p>
+
+            <a href="{% url 'maintenance_detail' req.pk %}">View Detail</a>
+
+            {% if request.user.role == "juristic" %}
+                | <a href="{% url 'maintenance_update_status' req.pk %}">Update Status</a>
+            {% endif %}
+        </div>
+    {% empty %}
+        <div style="background:#fff;border:1px solid #ddd;border-radius:10px;padding:18px;">
+            No maintenance requests found.
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

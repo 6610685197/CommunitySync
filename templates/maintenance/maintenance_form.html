@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width:800px;margin:30px auto;">
+    <div style="background:#fff;border:1px solid #ddd;border-radius:10px;padding:24px;">
+        <h1 style="margin-top:0;">{{ page_title }}</h1>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div style="margin-bottom:16px;">
+                <label><strong>Title</strong></label><br>
+                {{ form.title }}
+            </div>
+
+            <div style="margin-bottom:16px;">
+                <label><strong>Description</strong></label><br>
+                {{ form.description }}
+            </div>
+
+            <div style="margin-bottom:16px;">
+                <label><strong>Request Type</strong></label><br>
+                {{ form.request_type }}
+            </div>
+
+            <div style="margin-bottom:16px;">
+                <label><strong>Location Detail</strong></label><br>
+                {{ form.location_detail }}
+            </div>
+
+            <button type="submit" style="background:#2563eb;color:white;border:none;padding:10px 16px;border-radius:8px;cursor:pointer;">
+                Save
+            </button>
+            <a href="{% url 'maintenance_list' %}" style="margin-left:10px;">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

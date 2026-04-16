@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width:900px;margin:30px auto;">
+    <div style="background:#fff;border:1px solid #ddd;border-radius:10px;padding:24px;">
+        <h1 style="margin-top:0;">{{ req.title }}</h1>
+
+        <p><strong>Type:</strong> {{ req.get_request_type_display }}</p>
+        <p><strong>Status:</strong> {{ req.get_status_display }}</p>
+        <p><strong>Description:</strong> {{ req.description }}</p>
+        <p><strong>Location:</strong> {{ req.location_detail|default:"-" }}</p>
+        <p><strong>Resident:</strong>
+            {% if req.resident %}
+                {{ req.resident.name|default:req.resident.username }}
+            {% else %}
+                -
+            {% endif %}
+        </p>
+        <p><strong>Created By:</strong> {{ req.created_by.name|default:req.created_by.username|default:"-" }}</p>
+        <p><strong>Created At:</strong> {{ req.created_at|date:"d M Y H:i" }}</p>
+        <p><strong>Updated At:</strong> {{ req.updated_at|date:"d M Y H:i" }}</p>
+
+        <div style="margin-top:24px;">
+            <a href="{% url 'maintenance_list' %}">Back</a>
+            {% if request.user.role == "juristic" %}
+                | <a href="{% url 'maintenance_update_status' req.pk %}">Update Status</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width:1100px; margin:30px auto; padding:20px;">
+    <h1 style="margin-bottom:8px;">Resident Dashboard</h1>
+    <p style="color:#666; margin-bottom:24px;">
+        Welcome, {{ request.user.name|default:request.user.username }}
+    </p>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px; margin-bottom:28px;">
+        <div style="background:#dbeafe; padding:20px; border-radius:12px; border:1px solid #bfdbfe;">
+            <h3 style="margin:0 0 8px 0;">Announcements</h3>
+            <p style="font-size:28px; font-weight:bold; margin:0;">{{ total_announcements }}</p>
+        </div>
+
+        <div style="background:#dcfce7; padding:20px; border-radius:12px; border:1px solid #bbf7d0;">
+            <h3 style="margin:0 0 8px 0;">My Visitors</h3>
+            <p style="font-size:28px; font-weight:bold; margin:0;">{{ my_visitors_count }}</p>
+        </div>
+
+        <div style="background:#fef3c7; padding:20px; border-radius:12px; border:1px solid #fde68a;">
+            <h3 style="margin:0 0 8px 0;">Expected Visitors</h3>
+            <p style="font-size:28px; font-weight:bold; margin:0;">{{ expected_visitors_count }}</p>
+        </div>
+
+        <div style="background:#e9d5ff; padding:20px; border-radius:12px; border:1px solid #d8b4fe;">
+            <h3 style="margin:0 0 8px 0;">Arrived Visitors</h3>
+            <p style="font-size:28px; font-weight:bold; margin:0;">{{ arrived_visitors_count }}</p>
+        </div>
+
+        <div style="background:#fee2e2; padding:20px; border-radius:12px; border:1px solid #fecaca;">
+            <h3 style="margin:0 0 8px 0;">My Maintenance</h3>
+            <p style="font-size:28px; font-weight:bold; margin:0;">{{ my_maintenance_count }}</p>
+        </div>
+
+        <div style="background:#fef9c3; padding:20px; border-radius:12px; border:1px solid #fde047;">
+            <h3 style="margin:0 0 8px 0;">Pending Requests</h3>
+            <p style="font-size:28px; font-weight:bold; margin:0;">{{ pending_maintenance_count }}</p>
+        </div>
+
+        <div style="background:#d1fae5; padding:20px; border-radius:12px; border:1px solid #6ee7b7;">
+            <h3 style="margin:0 0 8px 0;">Completed Requests</h3>
+            <p style="font-size:28px; font-weight:bold; margin:0;">{{ completed_maintenance_count }}</p>
+        </div>
+    </div>
+
+    <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:28px;">
+        <a href="{% url 'announcement_list' %}" style="text-decoration:none; background:#2563eb; color:white; padding:10px 16px; border-radius:8px;">
+            View Announcements
+        </a>
+        <a href="{% url 'visitor_list' %}" style="text-decoration:none; background:#16a34a; color:white; padding:10px 16px; border-radius:8px;">
+            My Visitors
+        </a>
+        <a href="{% url 'maintenance_list' %}" style="text-decoration:none; background:#7c3aed; color:white; padding:10px 16px; border-radius:8px;">
+            My Maintenance
+        </a>
+        <a href="{% url 'maintenance_create' %}" style="text-decoration:none; background:#ea580c; color:white; padding:10px 16px; border-radius:8px;">
+            Create Maintenance Request
+        </a>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+        <div style="background:#fff; border:1px solid #ddd; border-radius:12px; padding:20px;">
+            <h2 style="margin-top:0;">Recent Announcements</h2>
+            {% for announcement in recent_announcements %}
+                <div style="padding:12px 0; border-bottom:1px solid #eee;">
+                    <a href="{% url 'announcement_detail' announcement.pk %}" style="text-decoration:none; color:#111; font-weight:bold;">
+                        {{ announcement.title }}
+                    </a>
+                    <p style="margin:6px 0 0 0; color:#666;">
+                        {{ announcement.created_at|date:"d M Y H:i" }}
+                    </p>
+                </div>
+            {% empty %}
+                <p>No announcements yet.</p>
+            {% endfor %}
+        </div>
+
+        <div style="background:#fff; border:1px solid #ddd; border-radius:12px; padding:20px;">
+            <h2 style="margin-top:0;">Recent Visitors</h2>
+            {% for visitor in recent_visitors %}
+                <div style="padding:12px 0; border-bottom:1px solid #eee;">
+                    <a href="{% url 'visitor_detail' visitor.pk %}" style="text-decoration:none; color:#111; font-weight:bold;">
+                        {{ visitor.name }}
+                    </a>
+                    <p style="margin:6px 0 0 0; color:#666;">
+                        {{ visitor.get_status_display }}{% if visitor.visit_time %} | {{ visitor.visit_time|date:"d M Y H:i" }}{% endif %}
+                    </p>
+                </div>
+            {% empty %}
+                <p>No visitors yet.</p>
+            {% endfor %}
+        </div>
+
+        <div style="background:#fff; border:1px solid #ddd; border-radius:12px; padding:20px; grid-column:1 / -1;">
+            <h2 style="margin-top:0;">Recent Maintenance Requests</h2>
+            {% for req in recent_maintenance %}
+                <div style="padding:12px 0; border-bottom:1px solid #eee;">
+                    <a href="{% url 'maintenance_detail' req.pk %}" style="text-decoration:none; color:#111; font-weight:bold;">
+                        {{ req.title }}
+                    </a>
+                    <p style="margin:6px 0 0 0; color:#666;">
+                        {{ req.get_request_type_display }} | {{ req.get_status_display }} | {{ req.created_at|date:"d M Y H:i" }}
+                    </p>
+                </div>
+            {% empty %}
+                <p>No maintenance requests yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

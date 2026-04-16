@@ -30,7 +30,7 @@ def login_view(request):
                 elif user.role == "security":
                     return redirect("security_dashboard")
                 elif user.role == "resident":
-                    return redirect("resident_home")
+                    return redirect("resident_dashboard")
             else:
                 return render(
                     request,

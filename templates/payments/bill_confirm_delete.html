@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width:700px;margin:30px auto;">
+    <div style="background:#fff;border:1px solid #ddd;border-radius:10px;padding:24px;">
+        <h1>Delete Bill</h1>
+        <p>Are you sure you want to delete <strong>{{ bill.title }}</strong>?</p>
+
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit" style="background:#dc2626;color:white;border:none;padding:10px 16px;border-radius:8px;">Delete</button>
+            <a href="{% url 'bill_detail' bill.pk %}" style="margin-left:8px;">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

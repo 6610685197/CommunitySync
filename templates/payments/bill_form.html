@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width:800px;margin:30px auto;">
+    <div style="background:#fff;border:1px solid #ddd;border-radius:10px;padding:24px;">
+        <h1 style="margin-top:0;">{{ page_title }}</h1>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div style="margin-bottom:12px;"><label>Resident</label><br>{{ form.resident }}</div>
+            <div style="margin-bottom:12px;"><label>Fee Type</label><br>{{ form.fee_type }}</div>
+            <div style="margin-bottom:12px;"><label>Title</label><br>{{ form.title }}</div>
+            <div style="margin-bottom:12px;"><label>Description</label><br>{{ form.description }}</div>
+            <div style="margin-bottom:12px;"><label>Amount</label><br>{{ form.amount }}</div>
+            <div style="margin-bottom:12px;"><label>Due Date</label><br>{{ form.due_date }}</div>
+            <div style="margin-bottom:12px;"><label>Billing Month</label><br>{{ form.billing_month }}</div>
+            <div style="margin-bottom:12px;"><label>Billing Year</label><br>{{ form.billing_year }}</div>
+            <div style="margin-bottom:12px;"><label>Status</label><br>{{ form.status }}</div>
+
+            <button type="submit" style="background:#2563eb;color:white;border:none;padding:10px 16px;border-radius:8px;">Save</button>
+            <a href="{% url 'bill_list' %}" style="margin-left:8px;">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

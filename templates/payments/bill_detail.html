@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width:950px;margin:30px auto;">
+    <div style="background:#fff;border:1px solid #ddd;border-radius:12px;padding:24px;">
+        <h1 style="margin-top:0;">{{ bill.title }}</h1>
+
+        <p><strong>Resident:</strong> {{ bill.resident.name|default:bill.resident.username }}</p>
+        <p><strong>Fee Type:</strong> {{ bill.fee_type.name }}</p>
+        <p><strong>Amount:</strong> {{ bill.amount }}</p>
+        <p><strong>Due Date:</strong> {{ bill.due_date }}</p>
+        <p><strong>Status:</strong> {{ bill.get_status_display }}</p>
+        <p><strong>Description:</strong> {{ bill.description|default:"-" }}</p>
+        <p><strong>Billing Month/Year:</strong> {{ bill.billing_month|default:"-" }} / {{ bill.billing_year|default:"-" }}</p>
+
+        <hr style="margin:24px 0;">
+
+        <h3>Payment Receipts</h3>
+        {% for receipt in bill.receipts.all %}
+            <div style="border:1px solid #ddd;border-radius:10px;padding:16px;margin-bottom:16px;background:#fafafa;">
+                <p><strong>Status:</strong> {{ receipt.get_status_display }}</p>
+                <p><strong>Submitted By:</strong> {{ receipt.submitted_by.name|default:receipt.submitted_by.username|default:"-" }}</p>
+                <p><strong>Submitted At:</strong> {{ receipt.created_at }}</p>
+                <p><strong>Note:</strong> {{ receipt.note|default:"-" }}</p>
+
+                {% if receipt.receipt_image %}
+                    <div style="margin:12px 0;">
+                        <img src="{{ receipt.receipt_image.url }}" alt="receipt" style="max-width:320px;border-radius:10px;border:1px solid #ccc;">
+                    </div>
+                {% endif %}
+
+                <p><strong>Review Note:</strong> {{ receipt.review_note|default:"-" }}</p>
+
+                {% if request.user.role == "juristic" %}
+                    <a href="{% url 'review_receipt' receipt.pk %}">Review Receipt</a>
+                {% endif %}
+            </div>
+        {% empty %}
+            <p>No receipts uploaded yet.</p>
+        {% endfor %}
+
+        {% if request.user.role == "resident" and bill.resident == request.user and bill.status != "paid" %}
+            <hr style="margin:24px 0;">
+            <h3>Upload Payment Receipt</h3>
+            <form method="POST" enctype="multipart/form-data" action="{% url 'upload_receipt' bill.pk %}">
+                {% csrf_token %}
+                <div style="margin-bottom:12px;">
+                    {{ receipt_form.receipt_image }}
+                </div>
+                <div style="margin-bottom:12px;">
+                    {{ receipt_form.note }}
+                </div>
+                <button type="submit" style="background:#2563eb;color:white;border:none;padding:10px 16px;border-radius:8px;cursor:pointer;">
+                    Submit Receipt
+                </button>
+            </form>
+        {% endif %}
+
+        <div style="margin-top:24px;">
+            <a href="{% url 'bill_list' %}">Back</a>
+            {% if request.user.role == "juristic" %}
+                | <a href="{% url 'bill_update' bill.pk %}">Edit</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

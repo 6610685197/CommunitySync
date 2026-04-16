@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width:800px;margin:30px auto;">
+    <div style="background:#fff;border:1px solid #ddd;border-radius:12px;padding:24px;">
+        <h1 style="margin-top:0;">Review Receipt</h1>
+
+        <p><strong>Bill:</strong> {{ receipt.bill.title }}</p>
+        <p><strong>Resident:</strong> {{ receipt.bill.resident.name|default:receipt.bill.resident.username }}</p>
+        <p><strong>Amount:</strong> {{ receipt.bill.amount }}</p>
+
+        {% if receipt.receipt_image %}
+            <div style="margin:16px 0;">
+                <img src="{{ receipt.receipt_image.url }}" alt="receipt" style="max-width:360px;border:1px solid #ccc;border-radius:10px;">
+            </div>
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+            <div style="margin-bottom:12px;">
+                <label>Status</label><br>
+                {{ form.status }}
+            </div>
+            <div style="margin-bottom:12px;">
+                <label>Review Note</label><br>
+                {{ form.review_note }}
+            </div>
+
+            <button type="submit" style="background:#2563eb;color:white;border:none;padding:10px 16px;border-radius:8px;">Save Review</button>
+            <a href="{% url 'bill_detail' receipt.bill.pk %}" style="margin-left:8px;">Back</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

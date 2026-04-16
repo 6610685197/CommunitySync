@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width:800px;margin:30px auto;">
+    <div style="background:#fff;border:1px solid #ddd;border-radius:10px;padding:24px;">
+        <h1>{{ page_title }}</h1>
+
+        <form method="POST">
+            {% csrf_token %}
+            <div style="margin-bottom:12px;"><label>Name</label><br>{{ form.name }}</div>
+            <div style="margin-bottom:12px;"><label>Fee Type</label><br>{{ form.fee_type }}</div>
+            <div style="margin-bottom:12px;"><label>Cycle</label><br>{{ form.cycle }}</div>
+            <div style="margin-bottom:12px;"><label>Target Type</label><br>{{ form.target_type }}</div>
+            <div style="margin-bottom:12px;"><label>Default Amount</label><br>{{ form.default_amount }}</div>
+            <div style="margin-bottom:12px;"><label>Is Active</label><br>{{ form.is_active }}</div>
+
+            <div style="margin-bottom:12px;">
+                <label>Selected Residents</label>
+                <div style="border:1px solid #ddd;padding:12px;border-radius:8px;max-height:220px;overflow:auto;">
+                    {% for resident in residents %}
+                        <div>
+                            <label>
+                                <input type="checkbox" name="resident_ids" value="{{ resident.id }}">
+                                {{ resident.name|default:resident.username }}
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <button type="submit" style="background:#2563eb;color:white;border:none;padding:10px 16px;border-radius:8px;">Save</button>
+            <a href="{% url 'billing_rule_list' %}" style="margin-left:8px;">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

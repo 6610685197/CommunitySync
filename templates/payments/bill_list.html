@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width:1100px;margin:30px auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <h1 style="margin:0;">Bills</h1>
+
+        {% if request.user.role == "juristic" %}
+            <div>
+                <a href="{% url 'bill_create' %}" style="background:#2563eb;color:white;text-decoration:none;padding:10px 14px;border-radius:8px;">+ Create Bill</a>
+                <a href="{% url 'fee_type_list' %}" style="background:#16a34a;color:white;text-decoration:none;padding:10px 14px;border-radius:8px;margin-left:8px;">Fee Types</a>
+                <a href="{% url 'billing_rule_list' %}" style="background:#7c3aed;color:white;text-decoration:none;padding:10px 14px;border-radius:8px;margin-left:8px;">Billing Rules</a>
+            </div>
+        {% endif %}
+    </div>
+
+    {% for bill in bills %}
+        <div style="background:#fff;border:1px solid #ddd;border-radius:10px;padding:18px;margin-bottom:16px;">
+            <h2 style="margin-top:0;">
+                <a href="{% url 'bill_detail' bill.pk %}" style="text-decoration:none;color:#111;">
+                    {{ bill.title }}
+                </a>
+            </h2>
+
+            <p style="color:#666;">
+                Type: {{ bill.fee_type.name }} |
+                Amount: {{ bill.amount }} |
+                Due: {{ bill.due_date }} |
+                Status: {{ bill.get_status_display }}
+            </p>
+
+            {% if request.user.role == "juristic" %}
+                <p style="color:#666;">
+                    Resident: {{ bill.resident.name|default:bill.resident.username }}
+                </p>
+            {% endif %}
+
+            <a href="{% url 'bill_detail' bill.pk %}">View Detail</a>
+
+            {% if request.user.role == "juristic" %}
+                | <a href="{% url 'bill_update' bill.pk %}">Edit</a>
+                | <a href="{% url 'bill_delete' bill.pk %}">Delete</a>
+            {% endif %}
+        </div>
+    {% empty %}
+        <div style="background:#fff;border:1px solid #ddd;border-radius:10px;padding:18px;">
+            No bills found.
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

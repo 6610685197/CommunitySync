@@ -6,7 +6,7 @@
         <h1 style="margin-top:0;">{{ bill.title }}</h1>
 
         <p><strong>Resident:</strong> {{ bill.resident.name|default:bill.resident.username }}</p>
-        <p><strong>Fee Type:</strong> {{ bill.fee_type.name }}</p>
+        <p><strong>Fee Type:</strong> {{ bill.fee_type_name }}</p>
         <p><strong>Amount:</strong> {{ bill.amount }}</p>
         <p><strong>Due Date:</strong> {{ bill.due_date }}</p>
         <p><strong>Status:</strong> {{ bill.get_status_display }}</p>

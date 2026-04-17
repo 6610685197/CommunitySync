@@ -11,7 +11,6 @@
         <div style="background:#fff;border:1px solid #ddd;border-radius:10px;padding:18px;margin-bottom:16px;">
             <h3 style="margin:0 0 8px 0;">{{ rule.name }}</h3>
             <p style="color:#666;">
-                Fee Type: {{ rule.fee_type.name }} |
                 Cycle: {{ rule.get_cycle_display }} |
                 Target: {{ rule.get_target_type_display }} |
                 Default Amount: {{ rule.default_amount|default:"-" }}
@@ -19,14 +18,9 @@
 
             <form method="POST" action="{% url 'generate_bills_from_rule' rule.pk %}" style="margin-top:14px;">
                 {% csrf_token %}
-                    <label>Billing Month</label>
-                    <input type="number" name="billing_month" min="1" max="12" placeholder="e.g. 4">
-
-                    <label>Billing Year</label>
-                    <input type="number" name="billing_year" placeholder="e.g. 2026">
-
-                    <label>Due Date</label>
-                    <input type="date" name="due_date">
+                <input type="number" name="billing_month" placeholder="Billing Month" min="1" max="12" style="padding:8px;">
+                <input type="number" name="billing_year" placeholder="Billing Year" style="padding:8px;">
+                <input type="date" name="due_date" style="padding:8px;">
                 <button type="submit" style="background:#2563eb;color:white;border:none;padding:9px 14px;border-radius:8px;">
                     Generate Bills
                 </button>

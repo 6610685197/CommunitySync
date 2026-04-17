@@ -11,9 +11,6 @@ urlpatterns = [
     path("bill/<int:pk>/upload-receipt/", views.upload_receipt, name="upload_receipt"),
     path("receipt/<int:receipt_id>/review/", views.review_receipt, name="review_receipt"),
 
-    path("fee-types/", views.fee_type_list, name="fee_type_list"),
-    path("fee-types/create/", views.fee_type_create, name="fee_type_create"),
-
     path("billing-rules/", views.billing_rule_list, name="billing_rule_list"),
     path("billing-rules/create/", views.billing_rule_create, name="billing_rule_create"),
     path("billing-rules/<int:rule_id>/generate/", views.generate_bills_from_rule, name="generate_bills_from_rule"),

@@ -1,13 +1,14 @@
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
 from django.shortcuts import render
-from django.db.models import Sum, Count, Q
+from django.db.models import Sum
 from decimal import Decimal
 
 from apps.announcements.models import Announcement
 from apps.visitors.models import Visitor
 from apps.maintenance.models import MaintenanceRequest
 from apps.payments.models import Bill
+from apps.communities.models import FacilityBooking
 
 
 @login_required
@@ -31,6 +32,9 @@ def resident_dashboard(request):
     recent_visitors = Visitor.objects.filter(resident=user).order_by("-created_at")[:5]
     recent_maintenance = MaintenanceRequest.objects.filter(resident=user).order_by("-created_at")[:5]
     recent_bills = bills.order_by("-created_at")[:5]
+    recent_bookings = FacilityBooking.objects.filter(resident=user).select_related(
+        "facility_unit", "facility_unit__facility"
+    ).order_by("-created_at")[:5]
 
     context = {
         "total_announcements": total_announcements,
@@ -44,5 +48,6 @@ def resident_dashboard(request):
         "recent_visitors": recent_visitors,
         "recent_maintenance": recent_maintenance,
         "recent_bills": recent_bills,
+        "recent_bookings": recent_bookings,
     }
     return render(request, "dashboard/resident_dashboard.html", context)

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width:1000px;margin:30px auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <h1 style="margin:0;">Facility Units</h1>
+        <a href="{% url 'facility_unit_create' %}" style="background:#16a34a;color:white;text-decoration:none;padding:10px 14px;border-radius:8px;">+ Add Unit</a>
+    </div>
+
+    {% for unit in units %}
+        <div style="background:#fff;border:1px solid #ddd;border-radius:12px;padding:18px;margin-bottom:16px;">
+            <h3 style="margin-top:0;">{{ unit.unit_name }}</h3>
+            <p><strong>Facility:</strong> {{ unit.facility.name }}</p>
+            <p><strong>Status:</strong> {{ unit.get_status_display }}</p>
+            <p><strong>Note:</strong> {{ unit.note|default:"-" }}</p>
+
+            <a href="{% url 'facility_unit_update' unit.pk %}">Edit</a>
+            | <a href="{% url 'facility_unit_delete' unit.pk %}">Delete</a>
+        </div>
+    {% empty %}
+        <div style="background:#fff;border:1px solid #ddd;border-radius:12px;padding:18px;">
+            No units found.
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

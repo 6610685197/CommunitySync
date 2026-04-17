@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width:800px;margin:30px auto;">
+    <div style="background:#fff;border:1px solid #ddd;border-radius:12px;padding:24px;">
+        <h1 style="margin-top:0;">{{ page_title }}</h1>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div style="margin-bottom:12px;">
+                <label><strong>Name</strong></label><br>
+                {{ form.name }}
+            </div>
+
+            <div style="margin-bottom:12px;">
+                <label><strong>Description</strong></label><br>
+                {{ form.description }}
+            </div>
+
+            <div style="margin-bottom:12px;">
+                <label><strong>Image</strong></label><br>
+                {{ form.image }}
+            </div>
+
+            <div style="margin-bottom:12px;">
+                <label><strong>Location</strong></label><br>
+                {{ form.location }}
+            </div>
+
+            <div style="margin-bottom:12px;">
+                <label><strong>Requires Booking</strong></label><br>
+                {{ form.requires_booking }}
+            </div>
+
+            <div style="margin-bottom:12px;">
+                <label><strong>Booking Note</strong></label><br>
+                {{ form.booking_note }}
+            </div>
+
+            <div style="margin-bottom:12px;">
+                <label><strong>Is Active</strong></label><br>
+                {{ form.is_active }}
+            </div>
+
+            <button type="submit" style="background:#2563eb;color:white;border:none;padding:10px 16px;border-radius:8px;">Save</button>
+            <a href="{% url 'facility_list' %}" style="margin-left:8px;">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

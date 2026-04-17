@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width:800px;margin:30px auto;">
+    <div style="background:#fff;border:1px solid #ddd;border-radius:12px;padding:24px;">
+        <h1 style="margin-top:0;">Book Facility Unit</h1>
+
+        <p><strong>Facility:</strong> {{ facility.name }}</p>
+        <p><strong>Unit:</strong> {{ unit.unit_name }}</p>
+        <p><strong>Status:</strong> {{ unit.get_status_display }}</p>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div style="margin-bottom:12px;">
+                <label><strong>Booking Date</strong></label><br>
+                {{ form.booking_date }}
+            </div>
+
+            <div style="margin-bottom:12px;">
+                <label><strong>Start Time</strong></label><br>
+                {{ form.start_time }}
+            </div>
+
+            <div style="margin-bottom:12px;">
+                <label><strong>End Time</strong></label><br>
+                {{ form.end_time }}
+            </div>
+
+            <div style="margin-bottom:12px;">
+                <label><strong>Note</strong></label><br>
+                {{ form.note }}
+            </div>
+
+            <button type="submit" style="background:#2563eb;color:white;border:none;padding:10px 16px;border-radius:8px;">Book</button>
+            <a href="{% url 'facility_detail' facility.pk %}" style="margin-left:8px;">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

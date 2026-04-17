@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width:1100px;margin:30px auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <h1 style="margin:0;">Facilities</h1>
+
+        {% if request.user.role == "juristic" %}
+            <div>
+                <a href="{% url 'facility_create' %}" style="background:#16a34a;color:white;text-decoration:none;padding:10px 14px;border-radius:8px;">+ Add Facility</a>
+                <a href="{% url 'facility_unit_list' %}" style="background:#2563eb;color:white;text-decoration:none;padding:10px 14px;border-radius:8px;margin-left:8px;">Manage Units</a>
+                <a href="{% url 'facility_booking_list' %}" style="background:#7c3aed;color:white;text-decoration:none;padding:10px 14px;border-radius:8px;margin-left:8px;">Bookings</a>
+            </div>
+        {% endif %}
+    </div>
+
+    {% for facility in facilities %}
+        <div style="background:#fff;border:1px solid #ddd;border-radius:12px;padding:18px;margin-bottom:16px;">
+            <div style="display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap;">
+                {% if facility.image %}
+                    <img src="{{ facility.image.url }}" alt="{{ facility.name }}" style="width:180px;height:180px;object-fit:cover;border-radius:10px;border:1px solid #ddd;">
+                {% endif %}
+
+                <div style="flex:1;">
+                    <h2 style="margin-top:0;">
+                        <a href="{% url 'facility_detail' facility.pk %}" style="text-decoration:none;color:#111;">
+                            {{ facility.name }}
+                        </a>
+                    </h2>
+
+                    <p><strong>Location:</strong> {{ facility.location|default:"-" }}</p>
+                    <p><strong>Booking Required:</strong> {% if facility.requires_booking %}Yes{% else %}No{% endif %}</p>
+                    <p><strong>Active:</strong> {% if facility.is_active %}Yes{% else %}No{% endif %}</p>
+                    <p>{{ facility.description|default:"-" }}</p>
+
+                    <a href="{% url 'facility_detail' facility.pk %}">View Detail</a>
+
+                    {% if request.user.role == "juristic" %}
+                        | <a href="{% url 'facility_update' facility.pk %}">Edit</a>
+                        | <a href="{% url 'facility_delete' facility.pk %}">Delete</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div style="background:#fff;border:1px solid #ddd;border-radius:12px;padding:18px;">
+            No facilities found.
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

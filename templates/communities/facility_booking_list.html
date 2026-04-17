@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width:1000px;margin:30px auto;">
+    <h1>Facility Bookings</h1>
+
+    {% for booking in bookings %}
+        <div style="background:#fff;border:1px solid #ddd;border-radius:12px;padding:18px;margin-bottom:16px;">
+            <h3 style="margin-top:0;">{{ booking.facility_unit.facility.name }} - {{ booking.facility_unit.unit_name }}</h3>
+            <p><strong>Resident:</strong> {{ booking.resident.name|default:booking.resident.username }}</p>
+            <p><strong>Date:</strong> {{ booking.booking_date }}</p>
+            <p><strong>Time:</strong> {{ booking.start_time }} - {{ booking.end_time }}</p>
+            <p><strong>Status:</strong> {{ booking.get_status_display }}</p>
+            <p><strong>Note:</strong> {{ booking.note|default:"-" }}</p>
+
+            {% if request.user.role == "resident" or request.user.role == "juristic" %}
+                {% if booking.status != "cancelled" %}
+                    <a href="{% url 'facility_booking_cancel' booking.pk %}">Cancel Booking</a>
+                {% endif %}
+            {% endif %}
+        </div>
+    {% empty %}
+        <div style="background:#fff;border:1px solid #ddd;border-radius:12px;padding:18px;">
+            No bookings found.
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

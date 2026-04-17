@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width:700px;margin:30px auto;">
+    <div style="background:#fff;border:1px solid #ddd;border-radius:12px;padding:24px;">
+        <h1>Cancel Booking</h1>
+        <p>Are you sure you want to cancel booking for <strong>{{ booking.facility_unit.facility.name }} - {{ booking.facility_unit.unit_name }}</strong>?</p>
+
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit" style="background:#dc2626;color:white;border:none;padding:10px 16px;border-radius:8px;">Yes, Cancel</button>
+            <a href="{% url 'facility_booking_list' %}" style="margin-left:8px;">Back</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

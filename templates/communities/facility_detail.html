@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width:1000px;margin:30px auto;">
+    <div style="background:#fff;border:1px solid #ddd;border-radius:12px;padding:24px;">
+        <h1 style="margin-top:0;">{{ facility.name }}</h1>
+
+        {% if facility.image %}
+            <div style="margin-bottom:16px;">
+                <img src="{{ facility.image.url }}" alt="{{ facility.name }}" style="max-width:320px;border-radius:10px;border:1px solid #ddd;">
+            </div>
+        {% endif %}
+
+        <p><strong>Location:</strong> {{ facility.location|default:"-" }}</p>
+        <p><strong>Booking Required:</strong> {% if facility.requires_booking %}Yes{% else %}No{% endif %}</p>
+        <p><strong>Active:</strong> {% if facility.is_active %}Yes{% else %}No{% endif %}</p>
+        <p><strong>Description:</strong> {{ facility.description|default:"-" }}</p>
+
+        {% if facility.requires_booking %}
+            <p><strong>Booking Note:</strong> {{ facility.booking_note|default:"-" }}</p>
+
+            <hr style="margin:24px 0;">
+
+            <h3>Units / Rooms / Slots</h3>
+            {% for unit in units %}
+                <div style="border:1px solid #ddd;border-radius:10px;padding:16px;margin-bottom:12px;background:#fafafa;">
+                    <p><strong>Name:</strong> {{ unit.unit_name }}</p>
+                    <p><strong>Status:</strong> {{ unit.get_status_display }}</p>
+                    <p><strong>Note:</strong> {{ unit.note|default:"-" }}</p>
+
+                    {% if request.user.role == "resident" and unit.status == "available" %}
+                        <a href="{% url 'facility_booking_create' unit.pk %}">Book This Unit</a>
+                    {% endif %}
+
+                    {% if request.user.role == "juristic" %}
+                        <a href="{% url 'facility_unit_update' unit.pk %}">Edit Unit</a>
+                    {% endif %}
+
+                </div>
+            {% empty %}
+                <p>No units yet.</p>
+            {% endfor %}
+        {% endif %}
+
+        <div style="margin-top:20px;">
+            <a href="{% url 'facility_list' %}">Back</a>
+
+            {% if request.user.role == "juristic" %}
+                | <a href="{% url 'facility_update' facility.pk %}">Edit</a>
+                | <a href="{% url 'facility_delete' facility.pk %}">Delete</a>
+            {% endif %}
+            {% if request.user.role == "juristic" and facility.requires_booking %}
+                    <a href="{% url 'facility_unit_create' facility.pk %}" style="background:#16a34a;color:white;text-decoration:none;padding:10px 14px;border-radius:8px;">
+                        + Add Unit
+                    </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

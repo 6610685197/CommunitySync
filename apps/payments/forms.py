@@ -1,17 +1,11 @@
 from django import forms
-from .models import FeeType, BillingRule, Bill, PaymentReceipt
-
-
-class FeeTypeForm(forms.ModelForm):
-    class Meta:
-        model = FeeType
-        fields = ["name", "description", "is_active"]
+from .models import BillingRule, Bill, PaymentReceipt
 
 
 class BillingRuleForm(forms.ModelForm):
     class Meta:
         model = BillingRule
-        fields = ["name", "fee_type", "cycle", "target_type", "default_amount", "is_active"]
+        fields = ["name", "cycle", "target_type", "default_amount", "is_active"]
 
 
 class BillForm(forms.ModelForm):
@@ -19,7 +13,7 @@ class BillForm(forms.ModelForm):
         model = Bill
         fields = [
             "resident",
-            "fee_type",
+            "name",
             "title",
             "description",
             "amount",

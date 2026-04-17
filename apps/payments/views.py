@@ -5,14 +5,8 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
 from apps.accounts.models import CustomUser
-from .models import FeeType, BillingRule, BillingRuleResident, Bill, PaymentReceipt
-from .forms import (
-    FeeTypeForm,
-    BillingRuleForm,
-    BillForm,
-    PaymentReceiptForm,
-    PaymentReceiptReviewForm,
-)
+from .models import BillingRule, BillingRuleResident, Bill, PaymentReceipt
+from .forms import BillingRuleForm, BillForm, PaymentReceiptForm, PaymentReceiptReviewForm
 
 
 def is_juristic(user):
@@ -25,10 +19,15 @@ def is_resident(user):
 
 @login_required
 def bill_list(request):
+    Bill.objects.filter(
+        status="unpaid",
+        due_date__lt=timezone.localdate()
+    ).update(status="overdue")
+
     if is_juristic(request.user):
-        bills = Bill.objects.select_related("resident", "fee_type").all()
+        bills = Bill.objects.select_related("resident", "billing_rule").all()
     elif is_resident(request.user):
-        bills = Bill.objects.select_related("resident", "fee_type").filter(resident=request.user)
+        bills = Bill.objects.select_related("resident", "billing_rule").filter(resident=request.user)
     else:
         return HttpResponseForbidden("No permission.")
 
@@ -37,8 +36,13 @@ def bill_list(request):
 
 @login_required
 def bill_detail(request, pk):
+    Bill.objects.filter(
+        status="unpaid",
+        due_date__lt=timezone.localdate()
+    ).update(status="overdue")
+
     bill = get_object_or_404(
-        Bill.objects.select_related("resident", "fee_type", "created_by"),
+        Bill.objects.select_related("resident", "billing_rule", "created_by"),
         pk=pk,
     )
 
@@ -177,40 +181,11 @@ def review_receipt(request, receipt_id):
 
 
 @login_required
-def fee_type_list(request):
-    if not is_juristic(request.user):
-        return HttpResponseForbidden("Only juristic can manage fee types.")
-
-    fee_types = FeeType.objects.all()
-    return render(request, "payments/fee_type_list.html", {"fee_types": fee_types})
-
-
-@login_required
-def fee_type_create(request):
-    if not is_juristic(request.user):
-        return HttpResponseForbidden("Only juristic can create fee types.")
-
-    if request.method == "POST":
-        form = FeeTypeForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Fee type created successfully.")
-            return redirect("fee_type_list")
-    else:
-        form = FeeTypeForm()
-
-    return render(request, "payments/fee_type_form.html", {
-        "form": form,
-        "page_title": "Create Fee Type",
-    })
-
-
-@login_required
 def billing_rule_list(request):
     if not is_juristic(request.user):
         return HttpResponseForbidden("Only juristic can manage billing rules.")
 
-    rules = BillingRule.objects.select_related("fee_type").all()
+    rules = BillingRule.objects.all()
     return render(request, "payments/billing_rule_list.html", {"rules": rules})
 
 
@@ -250,7 +225,7 @@ def generate_bills_from_rule(request, rule_id):
     if not is_juristic(request.user):
         return HttpResponseForbidden("Only juristic can generate bills.")
 
-    rule = get_object_or_404(BillingRule.objects.select_related("fee_type"), pk=rule_id)
+    rule = get_object_or_404(BillingRule, pk=rule_id)
 
     if request.method == "POST":
         month = request.POST.get("billing_month")
@@ -283,9 +258,9 @@ def generate_bills_from_rule(request, rule_id):
 
             Bill.objects.create(
                 resident=resident,
-                fee_type=rule.fee_type,
+                name=rule.name,
                 billing_rule=rule,
-                title=f"{rule.fee_type.name} Bill",
+                title=f"{rule.name} Bill",
                 description=f"Generated from rule: {rule.name}",
                 amount=rule.default_amount or 0,
                 due_date=due_date,

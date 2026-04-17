@@ -8,7 +8,6 @@
         {% if request.user.role == "juristic" %}
             <div>
                 <a href="{% url 'bill_create' %}" style="background:#2563eb;color:white;text-decoration:none;padding:10px 14px;border-radius:8px;">+ Create Bill</a>
-                <a href="{% url 'fee_type_list' %}" style="background:#16a34a;color:white;text-decoration:none;padding:10px 14px;border-radius:8px;margin-left:8px;">Fee Types</a>
                 <a href="{% url 'billing_rule_list' %}" style="background:#7c3aed;color:white;text-decoration:none;padding:10px 14px;border-radius:8px;margin-left:8px;">Billing Rules</a>
             </div>
         {% endif %}
@@ -23,7 +22,7 @@
             </h2>
 
             <p style="color:#666;">
-                Type: {{ bill.fee_type.name }} |
+                Name: {{ bill.name }} |
                 Amount: {{ bill.amount }} |
                 Due: {{ bill.due_date }} |
                 Status: {{ bill.get_status_display }}

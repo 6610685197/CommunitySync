@@ -8,7 +8,6 @@
         <form method="POST">
             {% csrf_token %}
             <div style="margin-bottom:12px;"><label>Name</label><br>{{ form.name }}</div>
-            <div style="margin-bottom:12px;"><label>Fee Type</label><br>{{ form.fee_type }}</div>
             <div style="margin-bottom:12px;"><label>Cycle</label><br>{{ form.cycle }}</div>
             <div style="margin-bottom:12px;"><label>Target Type</label><br>{{ form.target_type }}</div>
             <div style="margin-bottom:12px;"><label>Default Amount</label><br>{{ form.default_amount }}</div>

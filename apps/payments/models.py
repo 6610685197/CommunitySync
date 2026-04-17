@@ -1,15 +1,6 @@
-from decimal import Decimal
 from django.db import models
 from django.conf import settings
-
-
-class FeeType(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-    description = models.TextField(blank=True, null=True)
-    is_active = models.BooleanField(default=True)
-
-    def __str__(self):
-        return self.name
+from django.utils import timezone
 
 
 class BillingRule(models.Model):
@@ -24,12 +15,12 @@ class BillingRule(models.Model):
         ("selected", "Selected Residents"),
     )
 
-    name = models.CharField(max_length=150)
-    fee_type = models.ForeignKey(FeeType, on_delete=models.PROTECT, related_name="rules")
+    name = models.CharField(max_length=100, blank=True, default=" ")
     cycle = models.CharField(max_length=20, choices=CYCLE_CHOICES, default="monthly")
     target_type = models.CharField(max_length=20, choices=TARGET_CHOICES, default="all")
     default_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(default=timezone.now, editable=False)
 
     def __str__(self):
         return self.name
@@ -65,7 +56,9 @@ class Bill(models.Model):
         related_name="bills",
         limit_choices_to={"role": "resident"},
     )
-    fee_type = models.ForeignKey(FeeType, on_delete=models.PROTECT, related_name="bills")
+
+    name = models.CharField(max_length=100, default="", blank=True)
+
     billing_rule = models.ForeignKey(
         BillingRule,
         on_delete=models.SET_NULL,
@@ -92,7 +85,7 @@ class Bill(models.Model):
         related_name="created_bills",
     )
 
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(default=timezone.now, editable=False)
     updated_at = models.DateTimeField(auto_now=True)
 
     @property
@@ -131,8 +124,7 @@ class PaymentReceipt(models.Model):
         related_name="reviewed_payment_receipts",
     )
     review_note = models.TextField(blank=True, null=True)
-
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(default=timezone.now, editable=False)
     reviewed_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):

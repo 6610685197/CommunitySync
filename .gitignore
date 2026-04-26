@@ -1,6 +1,30 @@
-/__pycache__/*
-*.pyc
-/venv/
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Environment variables / Secrets
 .env
+*.env
+
+# Django database & media
 db.sqlite3
-/media
+db.sqlite3-journal
+media/
+staticfiles/
+
+# Logs
+*.log
+
+# VS Code / IDEs
+.vscode/
+.idea/
+
+# OS generated files
+.DS_Store
+Thumbs.db

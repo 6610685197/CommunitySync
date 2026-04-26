@@ -6,7 +6,7 @@
         <div>
             <h1 style="margin:0;">Visitors</h1>
             <p style="color:#555;margin:6px 0 0 0;">
-                {% if request.user.role == "security" %}
+                {% if request.user.role == "security" or request.user.role == "juristic" %}
                     Manage all visitor records
                 {% else %}
                     View your own visitors only
@@ -14,7 +14,7 @@
             </p>
         </div>
 
-        {% if request.user.role == "security" %}
+        {% if request.user.role == "security" or request.user.role == "juristic" %}
             <a href="{% url 'visitor_create' %}"
                style="background:#2563eb;color:white;padding:10px 14px;border-radius:6px;text-decoration:none;">
                + Add Visitor
@@ -46,7 +46,7 @@
                     <td style="padding:12px;border-bottom:1px solid #eee;">{{ visitor.get_status_display }}</td>
                     <td style="padding:12px;border-bottom:1px solid #eee;">
                         <a href="{% url 'visitor_detail' visitor.pk %}">View</a>
-                        {% if request.user.role == "security" %}
+                        {% if request.user.role == "security" or request.user.role == "juristic" %}
                             | <a href="{% url 'visitor_update' visitor.pk %}">Edit</a>
                             | <a href="{% url 'visitor_delete' visitor.pk %}">Delete</a>
                         {% endif %}

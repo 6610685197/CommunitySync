@@ -15,7 +15,7 @@ def is_resident(user):
 
 @login_required
 def visitor_list(request):
-    if request.user.role == "security":
+    if request.user.role in ["security", "juristic"]:
         visitors = Visitor.objects.select_related("resident", "created_by").prefetch_related("images").order_by("-created_at")
     elif request.user.role == "resident":
         visitors = Visitor.objects.select_related("resident", "created_by").prefetch_related("images").filter(
@@ -47,8 +47,8 @@ def visitor_detail(request, pk):
 
 @login_required
 def visitor_create(request):
-    if request.user.role != "security":
-        return HttpResponseForbidden("Only security can add visitors.")
+    if request.user.role not in ["security", "juristic"]:
+        return HttpResponseForbidden("Only security and juristic can add visitors.")
 
     if request.method == "POST":
         form = VisitorForm(request.POST)

@@ -31,7 +31,7 @@
 
         <div style="margin-top:20px;">
             <a href="{% url 'visitor_list' %}">Back</a>
-            {% if request.user.role == "security" %}
+            {% if request.user.role == "security" or request.user.role == "juristic" %}
                 | <a href="{% url 'visitor_update' visitor.pk %}">Edit</a>
                 | <a href="{% url 'visitor_delete' visitor.pk %}">Delete</a>
             {% endif %}

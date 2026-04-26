@@ -107,6 +107,7 @@ def facility_unit_list(request):
         return HttpResponseForbidden("Only juristic can manage units.")
 
     units = FacilityUnit.objects.select_related("facility").all()
+
     return render(request, "communities/facility_unit_list.html", {
         "units": units
     })

@@ -55,17 +55,8 @@ def logout_view(request):
 def admin_dashboard(request):
     # This corresponds to the "Dashboard" for Juristic Person [cite: 5]
     if request.user.role not in ["juristic", "security"]:
-        return redirect("resident_home")  # Prevent unauthorized access
+        return redirect("resident_dashboard")  # Prevent unauthorized access
     return render(request, "accounts/admin_dashboard.html")
-
-
-@login_required
-def resident_home(request):
-    # This corresponds to the Mobile Web App for Residents
-    if request.user.role != "resident":
-        return redirect("admin_dashboard")
-    return render(request, "accounts/resident_home.html")
-
 
 @csrf_exempt
 def oauth_auth(request):
@@ -83,20 +74,21 @@ def oauth_auth(request):
 
 
 def index(request):
-    """A simple landing page that redirects based on authentication status."""
     if request.user.is_authenticated:
         if request.user.role == "juristic":
             return redirect("admin_dashboard")
-        else:
-            return redirect("resident_home")
-    else:
-        return redirect("login")
+        elif request.user.role == "security":
+            return redirect("security_dashboard")
+        elif request.user.role == "resident":
+            return redirect("resident_dashboard")
+
+    return redirect("login")
     
 @login_required
 def create_account(request):
     # Only juristic can access this page
     if request.user.role != "juristic":
-        return redirect("resident_home")
+        return redirect("resident_dashboard")
 
     if request.method == "POST":
         form = CustomUserCreationForm(request.POST)
@@ -113,7 +105,7 @@ def user_list(request):
 
     # Only juristic can access
     if request.user.role != "juristic":
-        return redirect("resident_home")
+        return redirect("resident_dashboard")
 
     users = CustomUser.objects.all().order_by("role", "username")
 

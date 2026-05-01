@@ -1,44 +1,103 @@
 {% extends "base.html" %}
 
+{% block page_title %}Admin Dashboard{% endblock %}
+
 {% block content %}
-<div style="background:#f8f9fb;border-left:6px solid #2b6cb0;padding:16px;margin-bottom:12px;">
-	<h1 style="color:#2b6cb0;margin:0;">Admin Dashboard</h1>
-	<p style="margin:4px 0 0 0;color:#334155">Welcome, <strong>{{ request.user.username }}</strong> — <em>{{ request.user.role }}</em>.</p>
+<div class="mb-8">
+    <h1 class="text-2xl font-bold text-slate-800">Welcome back, {{ request.user.username }}! 👋</h1>
+    <p class="text-slate-500 mt-1">Here is what's happening in your community today.</p>
 </div>
 
-<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;">
-	<div style="background:#fff;border:1px solid #e6eef8;padding:12px;border-radius:6px;min-width:180px;">
-		<h3 style="margin:0 0 8px 0;color:#0f172a">Communities</h3>
-		<p style="margin:0;font-size:24px;color:#1e3a8a">12</p>
-	</div>
-	<div style="background:#fff;border:1px solid #fde68a;padding:12px;border-radius:6px;min-width:180px;">
-		<h3 style="margin:0 0 8px 0;color:#92400e">Pending Approvals</h3>
-		<p style="margin:0;font-size:24px;color:#b45309">3</p>
-	</div>
-	<div style="background:#fff;border:1px solid #c7f9cc;padding:12px;border-radius:6px;min-width:180px;">
-		<h3 style="margin:0 0 8px 0;color:#065f46">Active Residents</h3>
-		<p style="margin:0;font-size:24px;color:#047857">482</p>
-	</div>
+<!-- Metrics Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <!-- Total Residents -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6 flex items-center gap-4">
+        <div class="w-12 h-12 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+            <i data-feather="users" class="w-6 h-6"></i>
+        </div>
+        <div>
+            <p class="text-sm font-medium text-slate-500">Total Residents</p>
+            <h3 class="text-2xl font-bold text-slate-800">{{ total_residents|default:"0" }}</h3>
+        </div>
+    </div>
+
+    <!-- Total Visitors -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6 flex items-center gap-4">
+        <div class="w-12 h-12 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+            <i data-feather="user-check" class="w-6 h-6"></i>
+        </div>
+        <div>
+            <p class="text-sm font-medium text-slate-500">Total Visitors</p>
+            <h3 class="text-2xl font-bold text-slate-800">{{ total_visitors|default:"0" }}</h3>
+        </div>
+    </div>
+
+    <!-- Total Maintenance -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6 flex items-center gap-4">
+        <div class="w-12 h-12 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+            <i data-feather="tool" class="w-6 h-6"></i>
+        </div>
+        <div>
+            <p class="text-sm font-medium text-slate-500">Maintenance Requests</p>
+            <h3 class="text-2xl font-bold text-slate-800">{{ total_maintenance|default:"0" }}</h3>
+        </div>
+    </div>
+
+    <!-- Total Bills -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6 flex items-center gap-4">
+        <div class="w-12 h-12 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
+            <i data-feather="credit-card" class="w-6 h-6"></i>
+        </div>
+        <div>
+            <p class="text-sm font-medium text-slate-500">Total Bills</p>
+            <h3 class="text-2xl font-bold text-slate-800">{{ total_bills|default:"0" }}</h3>
+        </div>
+    </div>
 </div>
 
-<section>
-	<h2 style="margin-top:0;color:#0f172a">Admin Actions</h2>
-	<ul>
-		<li><a href="{% url 'create_account' %}">Create New Account</a></li>
-		<li><a href="{% url 'user_list' %}">View All Users</a></li>
-		<li><a href="{% url 'visitor_list' %}">Visitors</a></li>
-		<li><a href="{% url 'visitor_create' %}">Add Visitor</a></li>
-		<li><a href="{% url 'announcement_list' %}">Announcements</a></li>
-		<li><a href="{% url 'announcement_create' %}">Create Announcement</a></li>
-		<li><a href="{% url 'maintenance_list' %}">Maintenance</a></li>
-		<li><a href="{% url 'resident_dashboard' %}">Resident Dashboard</a></li>
-		<li><a href="{% url 'bill_list' %}">View All Bills</a></li>
-		<li><a href="{% url 'bill_create' %}">Create Bill Mannually</a></li>
-		<li><a href="{% url 'billing_rule_list' %}">Billing Rules List</a></li>
-		<li><a href="{% url 'billing_rule_create' %}">Create Billing Rule</a></li>
-		<li><a href="{% url 'facility_list' %}">Facilities</a></li>
-		<li><a href="{% url 'facility_create' %}">Add Facility</a></li>
-		<li><a href="{% url 'facility_booking_list' %}">Facility Bookings</a></li>
-	</ul>
-</section>
-{% endblock %} 
+<!-- Detailed Stats Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <!-- Visitor Breakdown -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+        <h3 class="text-lg font-semibold text-slate-800 mb-4">Visitor Breakdown</h3>
+        <div class="space-y-4">
+            <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                <span class="text-slate-600 font-medium">Expected</span>
+                <span class="font-bold text-slate-800">{{ expected_visitors|default:"0" }}</span>
+            </div>
+            <div class="flex items-center justify-between p-3 bg-emerald-50 rounded-lg">
+                <span class="text-emerald-700 font-medium">Arrived</span>
+                <span class="font-bold text-emerald-800">{{ arrived_visitors|default:"0" }}</span>
+            </div>
+            <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                <span class="text-blue-700 font-medium">Completed</span>
+                <span class="font-bold text-blue-800">{{ completed_visitors|default:"0" }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+        <h3 class="text-lg font-semibold text-slate-800 mb-4">Quick Actions</h3>
+        <div class="grid grid-cols-2 gap-3">
+            <a href="{% url 'create_account' %}" class="flex flex-col items-center justify-center p-4 rounded-lg border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50 transition-colors text-center">
+                <i data-feather="user-plus" class="w-6 h-6 text-indigo-500 mb-2"></i>
+                <span class="text-sm font-medium text-slate-700">New Account</span>
+            </a>
+            <a href="{% url 'visitor_create' %}" class="flex flex-col items-center justify-center p-4 rounded-lg border border-slate-200 hover:border-emerald-300 hover:bg-emerald-50 transition-colors text-center">
+                <i data-feather="user-check" class="w-6 h-6 text-emerald-500 mb-2"></i>
+                <span class="text-sm font-medium text-slate-700">Add Visitor</span>
+            </a>
+            <a href="{% url 'announcement_create' %}" class="flex flex-col items-center justify-center p-4 rounded-lg border border-slate-200 hover:border-amber-300 hover:bg-amber-50 transition-colors text-center">
+                <i data-feather="bell" class="w-6 h-6 text-amber-500 mb-2"></i>
+                <span class="text-sm font-medium text-slate-700">Announcement</span>
+            </a>
+            <a href="{% url 'facility_create' %}" class="flex flex-col items-center justify-center p-4 rounded-lg border border-slate-200 hover:border-purple-300 hover:bg-purple-50 transition-colors text-center">
+                <i data-feather="grid" class="w-6 h-6 text-purple-500 mb-2"></i>
+                <span class="text-sm font-medium text-slate-700">Add Facility</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

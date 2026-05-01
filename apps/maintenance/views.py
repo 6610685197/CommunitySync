@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
 from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
 
 from .models import MaintenanceRequest
 from .forms import MaintenanceRequestForm, MaintenanceStatusForm
@@ -22,10 +23,11 @@ def maintenance_list(request):
 
 @login_required
 def maintenance_detail(request, pk):
-    req = get_object_or_404(
-        MaintenanceRequest.objects.select_related("resident", "created_by"),
-        pk=pk
-    )
+    try:
+        req = MaintenanceRequest.objects.select_related("resident", "created_by").get(pk=pk)
+    except MaintenanceRequest.DoesNotExist:
+        messages.error(request, "The requested maintenance request no longer exists.")
+        return redirect("maintenance_list")
 
     if request.user.role == "juristic":
         pass

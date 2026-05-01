@@ -29,7 +29,11 @@ def facility_list(request):
 
 @login_required
 def facility_detail(request, pk):
-    facility = get_object_or_404(Facility, pk=pk)
+    try:
+        facility = Facility.objects.get(pk=pk)
+    except Facility.DoesNotExist:
+        messages.error(request, "The requested facility no longer exists.")
+        return redirect("facility_list")
 
     if request.user.role == "resident" and not facility.is_active:
         return HttpResponseForbidden("This facility is not available.")

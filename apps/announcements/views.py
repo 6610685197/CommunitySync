@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponseForbidden
+from django.contrib import messages
 
 from .models import Announcement
 from .forms import AnnouncementForm
@@ -20,7 +21,12 @@ def announcement_list(request):
 
 @login_required
 def announcement_detail(request, pk):
-    announcement = get_object_or_404(Announcement, pk=pk)
+    try:
+        announcement = Announcement.objects.get(pk=pk)
+    except Announcement.DoesNotExist:
+        messages.error(request, "The requested announcement no longer exists.")
+        return redirect("announcement_list")
+        
     return render(request, "announcements/announcement_detail.html", {
         "announcement": announcement
     })
@@ -77,6 +83,7 @@ def announcement_delete(request, pk):
 
     if request.method == "POST":
         announcement.delete()
+        messages.success(request, "Announcement deleted successfully.")
         return redirect("announcement_list")
 
     return render(request, "announcements/announcement_confirm_delete.html", {

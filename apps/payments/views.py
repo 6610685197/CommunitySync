@@ -41,10 +41,11 @@ def bill_detail(request, pk):
         due_date__lt=timezone.localdate()
     ).update(status="overdue")
 
-    bill = get_object_or_404(
-        Bill.objects.select_related("resident", "billing_rule", "created_by"),
-        pk=pk,
-    )
+    try:
+        bill = Bill.objects.select_related("resident", "billing_rule", "created_by").get(pk=pk)
+    except Bill.DoesNotExist:
+        messages.error(request, "The requested bill no longer exists.")
+        return redirect("bill_list")
 
     if is_resident(request.user) and bill.resident != request.user:
         return HttpResponseForbidden("No permission.")

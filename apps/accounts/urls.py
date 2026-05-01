@@ -10,4 +10,10 @@ urlpatterns = [
     path("home/", views.index, name="index"),
     path("users/", views.user_list, name="user_list"),
     path("security-dashboard/", views.security_dashboard, name="security_dashboard"),
+    
+    # Password Recovery
+    path("forgot-password/", views.forgot_password_view, name="forgot_password"),
+    path("forgot-password/verify-otp/", views.verify_otp_view, name="verify_otp"),
+    path("forgot-password/verify-plate/", views.verify_plate_view, name="verify_plate"),
+    path("reset-password/", views.reset_password_view, name="reset_password"),
 ]

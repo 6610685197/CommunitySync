@@ -1,3 +1,7 @@
+import random
+from django.core.mail import send_mail
+from django.conf import settings
+from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -12,6 +16,9 @@ from .services import OAuthFacade
 from django.utils import timezone
 from datetime import datetime, time
 from apps.visitors.models import Visitor
+from apps.maintenance.models import MaintenanceRequest
+from apps.payments.models import Bill
+from apps.communities.models import FacilityBooking
 
 
 def login_view(request):
@@ -56,7 +63,26 @@ def admin_dashboard(request):
     # This corresponds to the "Dashboard" for Juristic Person [cite: 5]
     if request.user.role not in ["juristic", "security"]:
         return redirect("resident_dashboard")  # Prevent unauthorized access
-    return render(request, "accounts/admin_dashboard.html")
+        
+    total_residents = CustomUser.objects.filter(role="resident").count()
+    total_visitors = Visitor.objects.count()
+    expected_visitors = Visitor.objects.filter(status="expected").count()
+    arrived_visitors = Visitor.objects.filter(status="arrived").count()
+    completed_visitors = Visitor.objects.filter(status="completed").count()
+    total_maintenance = MaintenanceRequest.objects.count()
+    total_bills = Bill.objects.count()
+    
+    context = {
+        "total_residents": total_residents,
+        "total_visitors": total_visitors,
+        "expected_visitors": expected_visitors,
+        "arrived_visitors": arrived_visitors,
+        "completed_visitors": completed_visitors,
+        "total_maintenance": total_maintenance,
+        "total_bills": total_bills,
+    }
+        
+    return render(request, "accounts/admin_dashboard.html", context)
 
 @csrf_exempt
 def oauth_auth(request):
@@ -137,3 +163,116 @@ def security_dashboard(request):
         "recent_visitors": recent_visitors,
     }
     return render(request, "accounts/security_dashboard.html", context)
+
+
+# --- Password Recovery ---
+
+def forgot_password_view(request):
+    if request.method == "POST":
+        identifier = request.POST.get("identifier")
+        method = request.POST.get("method")
+
+        try:
+            user = CustomUser.objects.get(username=identifier)
+        except CustomUser.DoesNotExist:
+            try:
+                user = CustomUser.objects.get(email=identifier)
+            except CustomUser.DoesNotExist:
+                messages.error(request, "User not found.")
+                return redirect("forgot_password")
+        
+        request.session["reset_user_id"] = user.id
+
+        if method == "email":
+            if not user.email:
+                messages.error(request, "User does not have an email address.")
+                return redirect("forgot_password")
+            
+            # Generate 4 digit code
+            code = str(random.randint(1000, 9999))
+            request.session["reset_code"] = code
+            
+            # Send Email
+            send_mail(
+                "Password Reset Code",
+                f"Your 4-digit password reset code is: {code}",
+                settings.DEFAULT_FROM_EMAIL,
+                [user.email],
+                fail_silently=False,
+            )
+            messages.success(request, "We have sent a 4-digit code to your email.")
+            return redirect("verify_otp")
+            
+        elif method == "plate":
+            return redirect("verify_plate")
+            
+    return render(request, "accounts/forgot_password.html")
+
+def verify_otp_view(request):
+    if "reset_user_id" not in request.session or "reset_code" not in request.session:
+        return redirect("forgot_password")
+        
+    if request.method == "POST":
+        code1 = request.POST.get("code1", "")
+        code2 = request.POST.get("code2", "")
+        code3 = request.POST.get("code3", "")
+        code4 = request.POST.get("code4", "")
+        submitted_code = code1 + code2 + code3 + code4
+        
+        if submitted_code == request.session["reset_code"]:
+            request.session["reset_verified"] = True
+            return redirect("reset_password")
+        else:
+            messages.error(request, "Invalid or expired code.")
+            
+    return render(request, "accounts/verify_otp.html")
+
+def verify_plate_view(request):
+    if "reset_user_id" not in request.session:
+        return redirect("forgot_password")
+        
+    if request.method == "POST":
+        plate = request.POST.get("plate", "").strip()
+        user_id = request.session["reset_user_id"]
+        
+        try:
+            user = CustomUser.objects.get(id=user_id)
+        except CustomUser.DoesNotExist:
+            return redirect("forgot_password")
+            
+        if user.car_plate_num and user.car_plate_num.strip().lower() == plate.lower():
+            request.session["reset_verified"] = True
+            return redirect("reset_password")
+        else:
+            messages.error(request, "License plate does not match our records.")
+            
+    return render(request, "accounts/verify_plate.html")
+
+def reset_password_view(request):
+    if not request.session.get("reset_verified"):
+        return redirect("forgot_password")
+        
+    if request.method == "POST":
+        password = request.POST.get("password")
+        confirm_password = request.POST.get("confirm_password")
+        
+        if password and password == confirm_password:
+            user_id = request.session.get("reset_user_id")
+            try:
+                user = CustomUser.objects.get(id=user_id)
+                user.set_password(password)
+                user.save()
+                messages.success(request, "Password successfully reset. You can now log in.")
+                
+                # clear session
+                request.session.pop("reset_user_id", None)
+                request.session.pop("reset_code", None)
+                request.session.pop("reset_verified", None)
+                
+                return redirect("login")
+            except CustomUser.DoesNotExist:
+                pass
+        else:
+            messages.error(request, "Passwords do not match.")
+            
+    return render(request, "accounts/reset_password.html")

@@ -156,3 +156,12 @@ LOGOUT_REDIRECT_URL = "login"
 # Supabase project URL (used to verify access tokens server-side)
 SUPABASE_URL = os.getenv("SUPABASE_URL", "https://rjxislnrsgmxfyvqwgfh.supabase.co")
 
+# Email Settings
+# For development, print emails to console. For production, set EMAIL_BACKEND to smtp.
+EMAIL_BACKEND = os.getenv("EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend")
+EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.gmail.com")
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", 587))
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True") == "True"
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "webmaster@localhost")

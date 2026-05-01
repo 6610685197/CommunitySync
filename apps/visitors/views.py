@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
+from django.contrib import messages
 from .models import Visitor
 from .forms import VisitorForm, VisitorImageFormSet
 
@@ -29,10 +30,11 @@ def visitor_list(request):
 
 @login_required
 def visitor_detail(request, pk):
-    visitor = get_object_or_404(
-        Visitor.objects.select_related("resident", "created_by").prefetch_related("images"),
-        pk=pk
-    )
+    try:
+        visitor = Visitor.objects.select_related("resident", "created_by").prefetch_related("images").get(pk=pk)
+    except Visitor.DoesNotExist:
+        messages.error(request, "The requested visitor no longer exists.")
+        return redirect("visitor_list")
 
     if request.user.role == "security":
         pass
@@ -120,6 +122,7 @@ def visitor_delete(request, pk):
 
     if request.method == "POST":
         visitor.delete()
+        messages.success(request, "Visitor deleted successfully.")
         return redirect("visitor_list")
 
     return render(request, "visitors/visitor_confirm_delete.html", {"visitor": visitor})

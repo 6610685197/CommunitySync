@@ -4,56 +4,115 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}CommunitySync{% endblock %}</title>
-
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Heroicons CDN for icons (Optional but good for Figma designs) -->
+    <script src="https://unpkg.com/feather-icons"></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-        }
-
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .quick-actions button {
-            margin: 4px;
-            padding: 8px 12px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-            cursor: pointer;
-        }
-
-        ul li {
-            margin: 6px 0;
-        }
+        /* Custom scrollbar and subtle transitions */
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
     </style>
 </head>
 
-<body>
+<body class="antialiased text-slate-800 flex h-screen overflow-hidden">
 
-    <!-- Top Navigation -->
-    <div class="navbar">
-        <h2>CommunitySync</h2>
-
+    <!-- Sidebar Navigation -->
+    <aside class="w-64 bg-slate-900 text-white flex flex-col hidden md:flex h-full">
+        <div class="h-16 flex items-center px-6 border-b border-slate-800">
+            <h2 class="text-xl font-bold tracking-tight text-white">CommunitySync</h2>
+        </div>
+        <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+            {% if request.user.is_authenticated %}
+                {% if request.user.role == 'juristic' or request.user.role == 'security' %}
+                <a href="{% url 'admin_dashboard' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800 transition-colors">
+                    <i data-feather="home" class="w-5 h-5 text-slate-400"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="{% url 'user_list' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800 transition-colors">
+                    <i data-feather="users" class="w-5 h-5 text-slate-400"></i>
+                    <span>Users</span>
+                </a>
+                {% endif %}
+                <a href="{% url 'visitor_list' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800 transition-colors">
+                    <i data-feather="user-check" class="w-5 h-5 text-slate-400"></i>
+                    <span>Visitors</span>
+                </a>
+                <a href="{% url 'maintenance_list' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800 transition-colors">
+                    <i data-feather="tool" class="w-5 h-5 text-slate-400"></i>
+                    <span>Maintenance</span>
+                </a>
+                <a href="{% url 'announcement_list' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800 transition-colors">
+                    <i data-feather="bell" class="w-5 h-5 text-slate-400"></i>
+                    <span>Announcements</span>
+                </a>
+                <a href="{% url 'bill_list' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800 transition-colors">
+                    <i data-feather="credit-card" class="w-5 h-5 text-slate-400"></i>
+                    <span>Payments</span>
+                </a>
+            {% endif %}
+        </nav>
+        
         {% if request.user.is_authenticated %}
-            <div>
-                Welcome, <strong>{{ request.user.name }}</strong>
-                <button onclick="logoutUser()">Logout</button>
-            </div>
+        <div class="p-4 border-t border-slate-800">
+            <button onclick="logoutUser()" class="flex items-center gap-3 px-3 py-2 w-full text-left rounded-lg text-red-400 hover:bg-slate-800 transition-colors">
+                <i data-feather="log-out" class="w-5 h-5"></i>
+                <span>Logout</span>
+            </button>
+        </div>
         {% endif %}
-    </div>
+    </aside>
 
-    <!-- Page Content -->
-    {% block content %}
-    {% endblock %}
+    <!-- Main Content Area -->
+    <div class="flex-1 flex flex-col h-full relative overflow-hidden">
+        <!-- Top Header -->
+        <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 z-10">
+            <div class="flex items-center gap-4">
+                <button class="md:hidden text-slate-500 hover:text-slate-700">
+                    <i data-feather="menu"></i>
+                </button>
+                <h1 class="text-xl font-semibold text-slate-800 sm:hidden md:block">{% block page_title %}{% endblock %}</h1>
+            </div>
+            {% if request.user.is_authenticated %}
+            <div class="flex items-center gap-3">
+                <div class="text-right hidden sm:block">
+                    <p class="text-sm font-medium text-slate-700">{{ request.user.username }}</p>
+                    <p class="text-xs text-slate-500 capitalize">{{ request.user.role }}</p>
+                </div>
+                <div class="w-9 h-9 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold">
+                    {{ request.user.username|make_list|first|upper }}
+                </div>
+            </div>
+            {% endif %}
+        </header>
+
+        <!-- Main Scrollable Content -->
+        <main class="flex-1 overflow-y-auto p-6">
+            <!-- Messages / Toasts -->
+            {% if messages %}
+            <div class="mb-6 space-y-2">
+                {% for message in messages %}
+                <div class="p-4 rounded-lg flex items-center gap-3 shadow-sm border
+                    {% if message.tags == 'success' %}bg-green-50 border-green-200 text-green-800
+                    {% elif message.tags == 'error' %}bg-red-50 border-red-200 text-red-800
+                    {% else %}bg-blue-50 border-blue-200 text-blue-800{% endif %}">
+                    {% if message.tags == 'success' %}<i data-feather="check-circle" class="w-5 h-5"></i>
+                    {% elif message.tags == 'error' %}<i data-feather="alert-circle" class="w-5 h-5"></i>
+                    {% else %}<i data-feather="info" class="w-5 h-5"></i>{% endif %}
+                    <span class="font-medium text-sm">{{ message }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% block content %}
+            {% endblock %}
+        </main>
+    </div>
 
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
+        feather.replace(); // Initialize icons
         const SUPABASE_URL = "https://rjxislnrsgmxfyvqwgfh.supabase.co";
         const SUPABASE_KEY = "sb_publishable_o6Na_xY_hTMB7Ald1lTw2w_d52XQw7S";
 
@@ -65,6 +124,5 @@
             window.location.href = "{% url 'logout' %}";
         }
     </script>
-
 </body>
 </html>

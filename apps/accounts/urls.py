@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    path("", views.index, name="index"),
     path("login/", views.login_view, name="login"),
     path("logout/", views.logout_view, name="logout"),
     path("create-account/", views.create_account, name="create_account"),
@@ -10,7 +11,6 @@ urlpatterns = [
     path("home/", views.index, name="index"),
     path("users/", views.user_list, name="user_list"),
     path("security-dashboard/", views.security_dashboard, name="security_dashboard"),
-    
     # Password Recovery
     path("forgot-password/", views.forgot_password_view, name="forgot_password"),
     path("forgot-password/verify-otp/", views.verify_otp_view, name="verify_otp"),

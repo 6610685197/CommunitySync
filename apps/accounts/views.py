@@ -275,4 +275,9 @@ def reset_password_view(request):
         else:
             messages.error(request, "Passwords do not match.")
             
-    return render(request, "accounts/reset_password.html")
+    return render(request, "accounts/reset_password.html")
+
+@login_required
+def link_account_view(request):
+    return render(request, "accounts/link_account.html")
+

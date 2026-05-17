@@ -1,47 +1,101 @@
 {% extends "base.html" %}
 
+{% block title %}Maintenance Requests{% endblock %}
+{% block page_title %}Maintenance Requests{% endblock %}
+
 {% block content %}
-<div style="max-width:1000px;margin:30px auto;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-        <h1 style="margin:0;">Maintenance Requests</h1>
-        {% if request.user.role == "resident" or request.user.role == "juristic" %}
-            <a href="{% url 'maintenance_create' %}" style="background:#16a34a;color:white;text-decoration:none;padding:10px 16px;border-radius:8px;">
-                + Create Request
-            </a>
-        {% endif %}
+<div class="mb-6 flex items-center justify-between">
+    <div>
+        <h1 class="text-2xl font-bold text-slate-800">Maintenance Requests</h1>
+        <p class="text-slate-500 mt-1">
+            {% if request.user.role == "juristic" %}Manage all maintenance requests from residents.
+            {% else %}Track your submitted maintenance requests.{% endif %}
+        </p>
     </div>
+    {% if request.user.role == "resident" or request.user.role == "juristic" %}
+    <a href="{% url 'maintenance_create' %}"
+       class="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
+        <i data-feather="plus" class="w-4 h-4"></i>
+        Create Request
+    </a>
+    {% endif %}
+</div>
 
-    {% for req in requests %}
-        <div style="background:#fff;border:1px solid #ddd;border-radius:10px;padding:18px;margin-bottom:16px;">
-            <h2 style="margin-top:0;">
-                <a href="{% url 'maintenance_detail' req.pk %}" style="text-decoration:none;color:#111;">
-                    {{ req.title }}
-                </a>
-            </h2>
-
-            <p style="color:#666;">
-                Type: {{ req.get_request_type_display }} |
-                Status: {{ req.get_status_display }} |
-                Resident:
-                {% if req.resident %}
-                    {{ req.resident.name|default:req.resident.username }}
-                {% else %}
-                    -
-                {% endif %}
-            </p>
-
-            <p>{{ req.description|truncatewords:25 }}</p>
-
-            <a href="{% url 'maintenance_detail' req.pk %}">View Detail</a>
-
-            {% if request.user.role == "juristic" %}
-                | <a href="{% url 'maintenance_update_status' req.pk %}">Update Status</a>
-            {% endif %}
-        </div>
-    {% empty %}
-        <div style="background:#fff;border:1px solid #ddd;border-radius:10px;padding:18px;">
-            No maintenance requests found.
-        </div>
-    {% endfor %}
+<div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+    <table class="w-full text-sm">
+        <thead>
+            <tr class="bg-slate-50 border-b border-slate-200">
+                <th class="px-5 py-3 text-left font-semibold text-slate-600">Title</th>
+                <th class="px-5 py-3 text-left font-semibold text-slate-600">Type</th>
+                <th class="px-5 py-3 text-left font-semibold text-slate-600">Resident</th>
+                <th class="px-5 py-3 text-left font-semibold text-slate-600">Status</th>
+                <th class="px-5 py-3 text-left font-semibold text-slate-600">Date</th>
+                <th class="px-5 py-3 text-left font-semibold text-slate-600">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+            {% for req in requests %}
+            <tr class="hover:bg-slate-50 transition-colors">
+                <td class="px-5 py-4">
+                    <a href="{% url 'maintenance_detail' req.pk %}"
+                       class="font-medium text-slate-800 hover:text-indigo-600 transition-colors">
+                        {{ req.title }}
+                    </a>
+                    {% if req.description %}
+                    <p class="text-xs text-slate-400 mt-0.5">{{ req.description|truncatewords:10 }}</p>
+                    {% endif %}
+                </td>
+                <td class="px-5 py-4">
+                    {% if req.request_type == "common" %}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">Common Area</span>
+                    {% else %}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">Home</span>
+                    {% endif %}
+                </td>
+                <td class="px-5 py-4">
+                    {% if req.resident %}
+                    <div class="flex items-center gap-2">
+                        <div class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-xs shrink-0">
+                            {{ req.resident.username|make_list|first|upper }}
+                        </div>
+                        <span class="text-slate-700">{{ req.resident.name|default:req.resident.username }}</span>
+                    </div>
+                    {% else %}
+                    <span class="text-slate-400">—</span>
+                    {% endif %}
+                </td>
+                <td class="px-5 py-4">
+                    {% if req.status == "pending" %}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700">Pending</span>
+                    {% elif req.status == "in_progress" %}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">In Progress</span>
+                    {% elif req.status == "completed" %}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">Completed</span>
+                    {% elif req.status == "rejected" %}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700">Rejected</span>
+                    {% endif %}
+                </td>
+                <td class="px-5 py-4 text-slate-500">{{ req.created_at|date:"d M Y" }}</td>
+                <td class="px-5 py-4">
+                    <div class="flex items-center gap-3">
+                        <a href="{% url 'maintenance_detail' req.pk %}"
+                           class="text-indigo-600 hover:text-indigo-800 font-medium transition-colors">View</a>
+                        {% if request.user.role == "juristic" %}
+                        <a href="{% url 'maintenance_update_status' req.pk %}"
+                           class="text-slate-500 hover:text-slate-700 transition-colors">Update</a>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="px-5 py-12 text-center text-slate-400">
+                    <i data-feather="tool" class="w-10 h-10 mx-auto mb-3 opacity-30"></i>
+                    <p class="font-medium">No maintenance requests found</p>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 {% endblock %}

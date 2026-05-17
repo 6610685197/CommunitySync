@@ -1,34 +1,102 @@
 {% extends "base.html" %}
 
+{% block title %}Review Receipt{% endblock %}
+{% block page_title %}Review Receipt{% endblock %}
+
 {% block content %}
-<div style="max-width:800px;margin:30px auto;">
-    <div style="background:#fff;border:1px solid #ddd;border-radius:12px;padding:24px;">
-        <h1 style="margin-top:0;">Review Receipt</h1>
+<div class="max-w-2xl mx-auto">
 
-        <p><strong>Bill:</strong> {{ receipt.bill.title }}</p>
-        <p><strong>Resident:</strong> {{ receipt.bill.resident.name|default:receipt.bill.resident.username }}</p>
-        <p><strong>Amount:</strong> {{ receipt.bill.amount }}</p>
-
-        {% if receipt.receipt_image %}
-            <div style="margin:16px 0;">
-                <img src="{{ receipt.receipt_image.url }}" alt="receipt" style="max-width:360px;border:1px solid #ccc;border-radius:10px;">
-            </div>
-        {% endif %}
-
-        <form method="POST">
-            {% csrf_token %}
-            <div style="margin-bottom:12px;">
-                <label>Status</label><br>
-                {{ form.status }}
-            </div>
-            <div style="margin-bottom:12px;">
-                <label>Review Note</label><br>
-                {{ form.review_note }}
-            </div>
-
-            <button type="submit" style="background:#2563eb;color:white;border:none;padding:10px 16px;border-radius:8px;">Save Review</button>
-            <a href="{% url 'bill_detail' receipt.bill.pk %}" style="margin-left:8px;">Back</a>
-        </form>
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-slate-800">Review Receipt</h1>
+        <p class="text-slate-500 mt-1">Approve or reject the payment submitted by the resident.</p>
     </div>
+
+    <!-- Bill Summary -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden mb-6">
+        <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
+            <h2 class="text-base font-semibold text-slate-700 flex items-center gap-2">
+                <i data-feather="file-text" class="w-4 h-4 text-slate-400"></i>
+                Bill Summary
+            </h2>
+        </div>
+        <div class="p-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+                <p class="text-xs font-medium text-slate-400 uppercase tracking-wide mb-1">Bill</p>
+                <p class="text-sm font-medium text-slate-800">{{ receipt.bill.title }}</p>
+            </div>
+            <div>
+                <p class="text-xs font-medium text-slate-400 uppercase tracking-wide mb-1">Resident</p>
+                <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-xs shrink-0">
+                        {{ receipt.bill.resident.username|make_list|first|upper }}
+                    </div>
+                    <span class="text-sm text-slate-700">{{ receipt.bill.resident.name|default:receipt.bill.resident.username }}</span>
+                </div>
+            </div>
+            <div>
+                <p class="text-xs font-medium text-slate-400 uppercase tracking-wide mb-1">Amount</p>
+                <p class="text-sm font-semibold text-slate-800">฿{{ receipt.bill.amount }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Receipt Image -->
+    {% if receipt.receipt_image %}
+    <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden mb-6">
+        <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
+            <h2 class="text-base font-semibold text-slate-700 flex items-center gap-2">
+                <i data-feather="image" class="w-4 h-4 text-slate-400"></i>
+                Submitted Receipt
+            </h2>
+        </div>
+        <div class="p-6">
+            <img src="{{ receipt.receipt_image.url }}" alt="Receipt"
+                 class="max-w-sm rounded-xl border border-slate-200 shadow-sm">
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Review Form -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
+            <h2 class="text-base font-semibold text-slate-700 flex items-center gap-2">
+                <i data-feather="check-square" class="w-4 h-4 text-slate-400"></i>
+                Decision
+            </h2>
+        </div>
+        <div class="p-6">
+            <form method="POST" class="space-y-5">
+                {% csrf_token %}
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1.5">
+                        Status <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.status }}
+                    {% if form.status.errors %}
+                    <p class="mt-1 text-xs text-red-600">{{ form.status.errors|join:", " }}</p>
+                    {% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1.5">Review Note</label>
+                    {{ form.review_note }}
+                    {% if form.review_note.errors %}
+                    <p class="mt-1 text-xs text-red-600">{{ form.review_note.errors|join:", " }}</p>
+                    {% endif %}
+                </div>
+                <div class="flex items-center gap-3">
+                    <button type="submit"
+                            class="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
+                        <i data-feather="save" class="w-4 h-4"></i>
+                        Save Review
+                    </button>
+                    <a href="{% url 'bill_detail' receipt.bill.pk %}"
+                       class="px-5 py-2.5 border border-slate-300 hover:bg-slate-50 text-slate-700 text-sm font-medium rounded-lg transition-colors">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
 </div>
 {% endblock %}

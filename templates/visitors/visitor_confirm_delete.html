@@ -1,18 +1,34 @@
 {% extends "base.html" %}
 
-{% block content %}
-<div style="max-width:600px;margin:20px auto;">
-    <div style="background:#fff;border:1px solid #ddd;border-radius:8px;padding:20px;">
-        <h1>Delete Visitor</h1>
-        <p>Are you sure you want to delete <strong>{{ visitor.name }}</strong>?</p>
+{% block title %}Delete Visitor{% endblock %}
+{% block page_title %}Delete Visitor{% endblock %}
 
-        <form method="POST">
-            {% csrf_token %}
-            <button type="submit" style="background:#dc2626;color:white;border:none;padding:10px 16px;border-radius:6px;">
-                Delete
-            </button>
-            <a href="{% url 'visitor_detail' visitor.pk %}" style="margin-left:10px;">Cancel</a>
-        </form>
+{% block content %}
+<div class="max-w-lg mx-auto">
+    <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+        <div class="px-6 py-4 border-b border-red-100 bg-red-50">
+            <h2 class="text-base font-semibold text-red-700 flex items-center gap-2">
+                <i data-feather="alert-triangle" class="w-4 h-4"></i>
+                Confirm Deletion
+            </h2>
+        </div>
+        <div class="p-6">
+            <p class="text-slate-700 mb-1">You are about to permanently delete:</p>
+            <p class="text-lg font-semibold text-slate-800 mb-4">{{ visitor.name }}</p>
+            <p class="text-sm text-slate-500 mb-6">This action cannot be undone. All visitor records and photos will be removed.</p>
+            <form method="POST" class="flex items-center gap-3">
+                {% csrf_token %}
+                <button type="submit"
+                        class="flex items-center gap-2 px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
+                    <i data-feather="trash-2" class="w-4 h-4"></i>
+                    Yes, Delete
+                </button>
+                <a href="{% url 'visitor_detail' visitor.pk %}"
+                   class="px-5 py-2.5 border border-slate-300 hover:bg-slate-50 text-slate-700 text-sm font-medium rounded-lg transition-colors">
+                    Cancel
+                </a>
+            </form>
+        </div>
     </div>
 </div>
 {% endblock %}

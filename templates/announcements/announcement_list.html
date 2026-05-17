@@ -1,46 +1,85 @@
 {% extends "base.html" %}
 
-{% block content %}
-<div style="max-width:1000px; margin:30px auto;">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-        <h1 style="margin:0;">Announcements</h1>
+{% block title %}Announcements{% endblock %}
+{% block page_title %}Announcements{% endblock %}
 
+{% block content %}
+<div class="mb-6 flex items-center justify-between">
+    <div>
+        <h1 class="text-2xl font-bold text-slate-800">Announcements</h1>
+        <p class="text-slate-500 mt-1">Community notices and updates from management.</p>
+    </div>
+    {% if request.user.role == "juristic" %}
+    <a href="{% url 'announcement_create' %}"
+       class="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
+        <i data-feather="plus" class="w-4 h-4"></i>
+        Create Announcement
+    </a>
+    {% endif %}
+</div>
+
+<div class="space-y-4">
+    {% for announcement in announcements %}
+    <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden hover:border-indigo-200 transition-colors">
+        <div class="p-6">
+            <div class="flex items-start justify-between gap-4">
+                <div class="flex items-start gap-4 min-w-0">
+                    <div class="w-10 h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 mt-0.5">
+                        <i data-feather="bell" class="w-5 h-5"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <a href="{% url 'announcement_detail' announcement.pk %}"
+                           class="text-base font-semibold text-slate-800 hover:text-indigo-600 transition-colors">
+                            {{ announcement.title }}
+                        </a>
+                        <div class="flex items-center gap-2 mt-1 text-xs text-slate-400">
+                            <div class="w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-xs shrink-0">
+                                {{ announcement.created_by.username|make_list|first|upper }}
+                            </div>
+                            <span>{{ announcement.created_by.name|default:announcement.created_by.username|default:"—" }}</span>
+                            <span>·</span>
+                            <span>{{ announcement.created_at|date:"d M Y, H:i" }}</span>
+                        </div>
+                        <p class="text-sm text-slate-500 mt-2 leading-relaxed">{{ announcement.content|truncatewords:30 }}</p>
+                    </div>
+                </div>
+
+                {% if request.user.role == "juristic" %}
+                <div class="flex items-center gap-2 shrink-0">
+                    <a href="{% url 'announcement_update' announcement.pk %}"
+                       class="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
+                        <i data-feather="edit-2" class="w-4 h-4"></i>
+                    </a>
+                    <a href="{% url 'announcement_delete' announcement.pk %}"
+                       class="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                        <i data-feather="trash-2" class="w-4 h-4"></i>
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="mt-4 pl-14">
+                <a href="{% url 'announcement_detail' announcement.pk %}"
+                   class="inline-flex items-center gap-1.5 text-sm text-indigo-600 hover:text-indigo-800 font-medium transition-colors">
+                    Read more
+                    <i data-feather="arrow-right" class="w-3.5 h-3.5"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="bg-white rounded-xl shadow-sm border border-slate-100 py-16 text-center">
+        <i data-feather="bell-off" class="w-12 h-12 mx-auto mb-3 text-slate-300"></i>
+        <p class="text-slate-500 font-medium">No announcements yet.</p>
         {% if request.user.role == "juristic" %}
-            <a href="{% url 'announcement_create' %}"
-               style="background:#16a34a; color:white; text-decoration:none; padding:10px 16px; border-radius:8px;">
-                + Create Announcement
-            </a>
+        <p class="text-slate-400 text-sm mt-1">Post an announcement to notify all residents.</p>
+        <a href="{% url 'announcement_create' %}"
+           class="inline-flex items-center gap-2 mt-5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors">
+            <i data-feather="plus" class="w-4 h-4"></i>
+            Create Announcement
+        </a>
         {% endif %}
     </div>
-
-    {% for announcement in announcements %}
-        <div style="background:#fff; border:1px solid #ddd; border-radius:10px; padding:18px; margin-bottom:16px;">
-            <h2 style="margin-top:0;">
-                <a href="{% url 'announcement_detail' announcement.pk %}" style="text-decoration:none; color:#111;">
-                    {{ announcement.title }}
-                </a>
-            </h2>
-
-            <p style="color:#666; margin-bottom:12px;">
-                By {{ announcement.created_by.name|default:announcement.created_by.username|default:"-" }}
-                | {{ announcement.created_at|date:"d M Y H:i" }}
-            </p>
-
-            <p>
-                {{ announcement.content|truncatewords:30 }}
-            </p>
-
-            <a href="{% url 'announcement_detail' announcement.pk %}">Read more</a>
-
-            {% if request.user.role == "juristic" %}
-                | <a href="{% url 'announcement_update' announcement.pk %}">Edit</a>
-                | <a href="{% url 'announcement_delete' announcement.pk %}">Delete</a>
-            {% endif %}
-        </div>
-    {% empty %}
-        <div style="background:#fff; border:1px solid #ddd; border-radius:10px; padding:18px;">
-            No announcements yet.
-        </div>
     {% endfor %}
 </div>
 {% endblock %}

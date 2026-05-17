@@ -1,44 +1,70 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>User List</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-<h2>All Users</h2>
+{% block title %}Users{% endblock %}
+{% block page_title %}Users{% endblock %}
 
-<table border="1" style="width:100%; text-align:center;">
-    <tr>
-        <th>Username</th>
-        <th>Name</th>
-        <th>Email</th>
-        <th>Role</th>
-        <th>Phone</th>
-        <th>Car Plate</th>
-        <th>Address</th>
-    </tr>
+{% block content %}
+<div class="mb-6 flex items-center justify-between">
+    <div>
+        <h1 class="text-2xl font-bold text-slate-800">All Users</h1>
+        <p class="text-slate-500 mt-1">Manage resident and staff accounts in your community.</p>
+    </div>
+    <a href="{% url 'create_account' %}" class="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
+        <i data-feather="user-plus" class="w-4 h-4"></i>
+        New Account
+    </a>
+</div>
 
-    {% for user in users %}
-    <tr>
-        <td>{{ user.username }}</td>
-        <td>{{ user.name }}</td>
-        <td>{{ user.email }}</td>
-        <td>{{ user.role }}</td>
-        <td>{{ user.phone_number }}</td>
-        <td>{{ user.car_plate_num }}</td>
-        <td>{{ user.address }}</td>
-    </tr>
-    {% empty %}
-    <tr>
-        <td colspan="7">No users found</td>
-    </tr>
-    {% endfor %}
-
-</table>
-
-<br>
-
-<a href="{% url 'admin_dashboard' %}">Back to Dashboard</a>
-
-</body>
-</html>
+<div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+    <table class="w-full text-sm">
+        <thead>
+            <tr class="bg-slate-50 border-b border-slate-200">
+                <th class="px-5 py-3 text-left font-semibold text-slate-600">Username</th>
+                <th class="px-5 py-3 text-left font-semibold text-slate-600">Name</th>
+                <th class="px-5 py-3 text-left font-semibold text-slate-600">Email</th>
+                <th class="px-5 py-3 text-left font-semibold text-slate-600">Role</th>
+                <th class="px-5 py-3 text-left font-semibold text-slate-600">Phone</th>
+                <th class="px-5 py-3 text-left font-semibold text-slate-600">Car Plate</th>
+                <th class="px-5 py-3 text-left font-semibold text-slate-600">Address</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+            {% for user in users %}
+            <tr class="hover:bg-slate-50 transition-colors">
+                <td class="px-5 py-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-xs shrink-0">
+                            {{ user.username|make_list|first|upper }}
+                        </div>
+                        <span class="font-medium text-slate-800">{{ user.username }}</span>
+                    </div>
+                </td>
+                <td class="px-5 py-4 text-slate-700">{{ user.name|default:"—" }}</td>
+                <td class="px-5 py-4 text-slate-600">{{ user.email }}</td>
+                <td class="px-5 py-4">
+                    {% if user.role == "juristic" %}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700">Juristic</span>
+                    {% elif user.role == "security" %}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700">Security</span>
+                    {% elif user.role == "resident" %}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">Resident</span>
+                    {% else %}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">{{ user.role|capfirst }}</span>
+                    {% endif %}
+                </td>
+                <td class="px-5 py-4 text-slate-600">{{ user.phone_number|default:"—" }}</td>
+                <td class="px-5 py-4 text-slate-600">{{ user.car_plate_num|default:"—" }}</td>
+                <td class="px-5 py-4 text-slate-600">{{ user.address|default:"—" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" class="px-5 py-12 text-center text-slate-400">
+                    <i data-feather="users" class="w-10 h-10 mx-auto mb-3 opacity-30"></i>
+                    <p class="font-medium">No users found</p>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,67 +1,187 @@
 {% extends "base.html" %}
 
+{% block title %}{{ bill.title }}{% endblock %}
+{% block page_title %}Bill Detail{% endblock %}
+
 {% block content %}
-<div style="max-width:950px;margin:30px auto;">
-    <div style="background:#fff;border:1px solid #ddd;border-radius:12px;padding:24px;">
-        <h1 style="margin-top:0;">{{ bill.title }}</h1>
+<div class="max-w-3xl mx-auto">
 
-        <p><strong>Resident:</strong> {{ bill.resident.name|default:bill.resident.username }}</p>
-        <p><strong>Fee Type:</strong> {{ bill.fee_type_name }}</p>
-        <p><strong>Amount:</strong> {{ bill.amount }}</p>
-        <p><strong>Due Date:</strong> {{ bill.due_date }}</p>
-        <p><strong>Status:</strong> {{ bill.get_status_display }}</p>
-        <p><strong>Description:</strong> {{ bill.description|default:"-" }}</p>
-        <p><strong>Billing Month/Year:</strong> {{ bill.billing_month|default:"-" }} / {{ bill.billing_year|default:"-" }}</p>
+    <!-- Header -->
+    <div class="mb-6 flex items-start justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-800">{{ bill.title }}</h1>
+            <p class="text-slate-500 mt-1">{{ bill.name }}</p>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+            {% if request.user.role == "juristic" %}
+            <a href="{% url 'bill_update' bill.pk %}"
+               class="flex items-center gap-2 px-4 py-2 border border-slate-300 hover:bg-slate-50 text-slate-700 text-sm font-medium rounded-lg transition-colors">
+                <i data-feather="edit-2" class="w-4 h-4"></i>
+                Edit
+            </a>
+            {% endif %}
+            <a href="{% url 'bill_list' %}"
+               class="flex items-center gap-2 px-4 py-2 border border-slate-300 hover:bg-slate-50 text-slate-700 text-sm font-medium rounded-lg transition-colors">
+                <i data-feather="arrow-left" class="w-4 h-4"></i>
+                Back
+            </a>
+        </div>
+    </div>
 
-        <hr style="margin:24px 0;">
-
-        <h3>Payment Receipts</h3>
-        {% for receipt in bill.receipts.all %}
-            <div style="border:1px solid #ddd;border-radius:10px;padding:16px;margin-bottom:16px;background:#fafafa;">
-                <p><strong>Status:</strong> {{ receipt.get_status_display }}</p>
-                <p><strong>Submitted By:</strong> {{ receipt.submitted_by.name|default:receipt.submitted_by.username|default:"-" }}</p>
-                <p><strong>Submitted At:</strong> {{ receipt.created_at }}</p>
-                <p><strong>Note:</strong> {{ receipt.note|default:"-" }}</p>
-
-                {% if receipt.receipt_image %}
-                    <div style="margin:12px 0;">
-                        <img src="{{ receipt.receipt_image.url }}" alt="receipt" style="max-width:320px;border-radius:10px;border:1px solid #ccc;">
+    <!-- Bill Info Card -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden mb-6">
+        <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
+            <h2 class="text-base font-semibold text-slate-700 flex items-center gap-2">
+                <i data-feather="file-text" class="w-4 h-4 text-slate-400"></i>
+                Bill Info
+            </h2>
+        </div>
+        <div class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8">
+            <div>
+                <p class="text-xs font-medium text-slate-400 uppercase tracking-wide mb-1">Resident</p>
+                <div class="flex items-center gap-2">
+                    <div class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-xs shrink-0">
+                        {{ bill.resident.username|make_list|first|upper }}
                     </div>
-                {% endif %}
-
-                <p><strong>Review Note:</strong> {{ receipt.review_note|default:"-" }}</p>
-
-                {% if request.user.role == "juristic" %}
-                    <a href="{% url 'review_receipt' receipt.pk %}">Review Receipt</a>
+                    <span class="text-sm font-medium text-slate-800">{{ bill.resident.name|default:bill.resident.username }}</span>
+                </div>
+            </div>
+            <div>
+                <p class="text-xs font-medium text-slate-400 uppercase tracking-wide mb-1">Status</p>
+                {% if bill.status == "paid" %}
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">Paid</span>
+                {% elif bill.status == "unpaid" %}
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">Unpaid</span>
+                {% elif bill.status == "pending_review" %}
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700">Pending Review</span>
+                {% elif bill.status == "overdue" %}
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-700">Overdue</span>
+                {% elif bill.status == "rejected" %}
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700">Rejected</span>
+                {% else %}
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">{{ bill.get_status_display }}</span>
                 {% endif %}
             </div>
-        {% empty %}
-            <p>No receipts uploaded yet.</p>
-        {% endfor %}
-
-        {% if request.user.role == "resident" and bill.resident == request.user and bill.status != "paid" %}
-            <hr style="margin:24px 0;">
-            <h3>Upload Payment Receipt</h3>
-            <form method="POST" enctype="multipart/form-data" action="{% url 'upload_receipt' bill.pk %}">
-                {% csrf_token %}
-                <div style="margin-bottom:12px;">
-                    {{ receipt_form.receipt_image }}
-                </div>
-                <div style="margin-bottom:12px;">
-                    {{ receipt_form.note }}
-                </div>
-                <button type="submit" style="background:#2563eb;color:white;border:none;padding:10px 16px;border-radius:8px;cursor:pointer;">
-                    Submit Receipt
-                </button>
-            </form>
-        {% endif %}
-
-        <div style="margin-top:24px;">
-            <a href="{% url 'bill_list' %}">Back</a>
-            {% if request.user.role == "juristic" %}
-                | <a href="{% url 'bill_update' bill.pk %}">Edit</a>
+            <div>
+                <p class="text-xs font-medium text-slate-400 uppercase tracking-wide mb-1">Amount</p>
+                <p class="text-sm font-semibold text-slate-800">฿{{ bill.amount }}</p>
+            </div>
+            <div>
+                <p class="text-xs font-medium text-slate-400 uppercase tracking-wide mb-1">Due Date</p>
+                <p class="text-sm text-slate-700">{{ bill.due_date }}</p>
+            </div>
+            {% if bill.billing_month or bill.billing_year %}
+            <div>
+                <p class="text-xs font-medium text-slate-400 uppercase tracking-wide mb-1">Billing Period</p>
+                <p class="text-sm text-slate-700">{{ bill.billing_month|default:"—" }} / {{ bill.billing_year|default:"—" }}</p>
+            </div>
+            {% endif %}
+            {% if bill.description %}
+            <div class="sm:col-span-2">
+                <p class="text-xs font-medium text-slate-400 uppercase tracking-wide mb-1">Description</p>
+                <p class="text-sm text-slate-700">{{ bill.description }}</p>
+            </div>
             {% endif %}
         </div>
     </div>
+
+    <!-- Payment Receipts -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden mb-6">
+        <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
+            <h2 class="text-base font-semibold text-slate-700 flex items-center gap-2">
+                <i data-feather="image" class="w-4 h-4 text-slate-400"></i>
+                Payment Receipts
+            </h2>
+        </div>
+        <div class="p-6 space-y-4">
+            {% for receipt in bill.receipts.all %}
+            <div class="border border-slate-200 rounded-xl p-5 bg-slate-50">
+                <div class="flex items-start justify-between gap-4 mb-4">
+                    <div>
+                        <p class="text-xs font-medium text-slate-400 uppercase tracking-wide mb-1">Submitted by</p>
+                        <p class="text-sm font-medium text-slate-800">
+                            {{ receipt.submitted_by.name|default:receipt.submitted_by.username|default:"—" }}
+                        </p>
+                        <p class="text-xs text-slate-400 mt-0.5">{{ receipt.created_at|date:"d M Y, H:i" }}</p>
+                    </div>
+                    <div class="text-right">
+                        {% if receipt.status == "approved" %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">Approved</span>
+                        {% elif receipt.status == "rejected" %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700">Rejected</span>
+                        {% else %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700">Pending</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if receipt.receipt_image %}
+                <div class="mb-4">
+                    <img src="{{ receipt.receipt_image.url }}" alt="Receipt image"
+                         class="max-w-xs rounded-lg border border-slate-200 shadow-sm">
+                </div>
+                {% endif %}
+
+                {% if receipt.note %}
+                <div class="mb-3">
+                    <p class="text-xs font-medium text-slate-400 uppercase tracking-wide mb-1">Note</p>
+                    <p class="text-sm text-slate-700">{{ receipt.note }}</p>
+                </div>
+                {% endif %}
+
+                {% if receipt.review_note %}
+                <div class="mb-3 p-3 bg-white rounded-lg border border-slate-200">
+                    <p class="text-xs font-medium text-slate-400 uppercase tracking-wide mb-1">Review Note</p>
+                    <p class="text-sm text-slate-700">{{ receipt.review_note }}</p>
+                </div>
+                {% endif %}
+
+                {% if request.user.role == "juristic" %}
+                <a href="{% url 'review_receipt' receipt.pk %}"
+                   class="inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium rounded-lg transition-colors">
+                    <i data-feather="check-square" class="w-3.5 h-3.5"></i>
+                    Review Receipt
+                </a>
+                {% endif %}
+            </div>
+            {% empty %}
+            <div class="text-center py-8 text-slate-400">
+                <i data-feather="image" class="w-10 h-10 mx-auto mb-2 opacity-30"></i>
+                <p class="text-sm font-medium">No receipts uploaded yet.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Upload Receipt (residents only) -->
+    {% if request.user.role == "resident" and bill.resident == request.user and bill.status != "paid" %}
+    <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
+            <h2 class="text-base font-semibold text-slate-700 flex items-center gap-2">
+                <i data-feather="upload" class="w-4 h-4 text-slate-400"></i>
+                Upload Payment Receipt
+            </h2>
+        </div>
+        <div class="p-6">
+            <form method="POST" enctype="multipart/form-data" action="{% url 'upload_receipt' bill.pk %}" class="space-y-4">
+                {% csrf_token %}
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1.5">Receipt Image <span class="text-red-500">*</span></label>
+                    {{ receipt_form.receipt_image }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1.5">Note</label>
+                    {{ receipt_form.note }}
+                </div>
+                <button type="submit"
+                        class="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
+                    <i data-feather="upload" class="w-4 h-4"></i>
+                    Submit Receipt
+                </button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
 </div>
 {% endblock %}

@@ -1,35 +1,151 @@
 {% extends "base.html" %}
 
+{% block title %}{{ page_title }}{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+
 {% block content %}
-<div style="max-width:800px;margin:30px auto;">
-    <div style="background:#fff;border:1px solid #ddd;border-radius:10px;padding:24px;">
-        <h1>{{ page_title }}</h1>
+<div class="max-w-2xl mx-auto">
 
-        <form method="POST">
-            {% csrf_token %}
-            <div style="margin-bottom:12px;"><label>Name</label><br>{{ form.name }}</div>
-            <div style="margin-bottom:12px;"><label>Cycle</label><br>{{ form.cycle }}</div>
-            <div style="margin-bottom:12px;"><label>Target Type</label><br>{{ form.target_type }}</div>
-            <div style="margin-bottom:12px;"><label>Default Amount</label><br>{{ form.default_amount }}</div>
-            <div style="margin-bottom:12px;"><label>Is Active</label><br>{{ form.is_active }}</div>
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-slate-800">{{ page_title }}</h1>
+        <p class="text-slate-500 mt-1">Define how and when bills are generated for residents.</p>
+    </div>
 
-            <div style="margin-bottom:12px;">
-                <label>Selected Residents</label>
-                <div style="border:1px solid #ddd;padding:12px;border-radius:8px;max-height:220px;overflow:auto;">
-                    {% for resident in residents %}
-                        <div>
-                            <label>
-                                <input type="checkbox" name="resident_ids" value="{{ resident.id }}">
-                                {{ resident.name|default:resident.username }}
-                            </label>
-                        </div>
-                    {% endfor %}
-                </div>
+    <form method="POST" class="space-y-6">
+        {% csrf_token %}
+
+        <!-- Rule Details Card -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
+                <h2 class="text-base font-semibold text-slate-700 flex items-center gap-2">
+                    <i data-feather="file-text" class="w-4 h-4 text-slate-400"></i>
+                    Rule Details
+                </h2>
             </div>
 
-            <button type="submit" style="background:#2563eb;color:white;border:none;padding:10px 16px;border-radius:8px;">Save</button>
-            <a href="{% url 'billing_rule_list' %}" style="margin-left:8px;">Cancel</a>
-        </form>
-    </div>
+            <div class="p-6 space-y-5">
+
+                <!-- Name -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1.5">
+                        Rule Name <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.name }}
+                    {% if form.name.errors %}
+                    <p class="mt-1 text-xs text-red-600">{{ form.name.errors|join:", " }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Cycle + Target Type side by side -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1.5">
+                            Billing Cycle <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.cycle }}
+                        {% if form.cycle.errors %}
+                        <p class="mt-1 text-xs text-red-600">{{ form.cycle.errors|join:", " }}</p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1.5">
+                            Target Residents <span class="text-red-500">*</span>
+                        </label>
+                        {{ form.target_type }}
+                        {% if form.target_type.errors %}
+                        <p class="mt-1 text-xs text-red-600">{{ form.target_type.errors|join:", " }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Default Amount -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1.5">
+                        Default Amount (฿)
+                    </label>
+                    {{ form.default_amount }}
+                    <p class="mt-1 text-xs text-slate-400">Leave blank to set the amount manually per bill.</p>
+                    {% if form.default_amount.errors %}
+                    <p class="mt-1 text-xs text-red-600">{{ form.default_amount.errors|join:", " }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Is Active -->
+                <div class="flex items-center gap-3 p-4 bg-slate-50 rounded-lg border border-slate-200">
+                    {{ form.is_active }}
+                    <div>
+                        <label for="id_is_active" class="text-sm font-medium text-slate-700 cursor-pointer">Active Rule</label>
+                        <p class="text-xs text-slate-400 mt-0.5">Inactive rules are skipped during bill generation.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Resident Selection Card (shown only when target_type = "selected") -->
+        <div id="resident-section" class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden hidden">
+            <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
+                <h2 class="text-base font-semibold text-slate-700 flex items-center gap-2">
+                    <i data-feather="users" class="w-4 h-4 text-slate-400"></i>
+                    Select Residents
+                </h2>
+                <p class="text-xs text-slate-400 mt-0.5">Choose which residents this rule applies to.</p>
+            </div>
+
+            <div class="p-6">
+                {% if residents %}
+                <div class="border border-slate-200 rounded-lg overflow-hidden divide-y divide-slate-100 max-h-64 overflow-y-auto">
+                    {% for resident in residents %}
+                    <label class="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 cursor-pointer transition-colors">
+                        <input type="checkbox" name="resident_ids" value="{{ resident.id }}"
+                               class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
+                        <div>
+                            <span class="text-sm font-medium text-slate-800">{{ resident.name|default:resident.username }}</span>
+                            {% if resident.name %}
+                            <span class="text-xs text-slate-400 ml-1">@{{ resident.username }}</span>
+                            {% endif %}
+                        </div>
+                    </label>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-8 text-slate-400">
+                    <i data-feather="user-x" class="w-8 h-8 mx-auto mb-2 opacity-40"></i>
+                    <p class="text-sm">No resident accounts found.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex items-center gap-3">
+            <button type="submit"
+                    class="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
+                <i data-feather="save" class="w-4 h-4"></i>
+                Save Rule
+            </button>
+            <a href="{% url 'billing_rule_list' %}"
+               class="px-5 py-2.5 border border-slate-300 hover:bg-slate-50 text-slate-700 text-sm font-medium rounded-lg transition-colors">
+                Cancel
+            </a>
+        </div>
+
+    </form>
 </div>
+
+<script>
+    const targetSelect = document.getElementById('id_target_type');
+    const residentSection = document.getElementById('resident-section');
+
+    function toggleResidents() {
+        if (targetSelect.value === 'selected') {
+            residentSection.classList.remove('hidden');
+        } else {
+            residentSection.classList.add('hidden');
+        }
+    }
+
+    targetSelect.addEventListener('change', toggleResidents);
+    toggleResidents(); // run on load in case of form re-render after POST error
+</script>
 {% endblock %}

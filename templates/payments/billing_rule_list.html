@@ -1,33 +1,104 @@
 {% extends "base.html" %}
 
+{% block title %}Billing Rules{% endblock %}
+{% block page_title %}Billing Rules{% endblock %}
+
 {% block content %}
-<div style="max-width:1000px;margin:30px auto;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-        <h1 style="margin:0;">Billing Rules</h1>
-        <a href="{% url 'billing_rule_create' %}" style="background:#16a34a;color:white;text-decoration:none;padding:10px 14px;border-radius:8px;">+ Create Billing Rule</a>
+<div class="mb-6 flex items-center justify-between">
+    <div>
+        <h1 class="text-2xl font-bold text-slate-800">Billing Rules</h1>
+        <p class="text-slate-500 mt-1">Manage rules used to automatically generate resident bills.</p>
     </div>
+    <a href="{% url 'billing_rule_create' %}"
+       class="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
+        <i data-feather="plus" class="w-4 h-4"></i>
+        Create Billing Rule
+    </a>
+</div>
 
+{% if rules %}
+<div class="space-y-4">
     {% for rule in rules %}
-        <div style="background:#fff;border:1px solid #ddd;border-radius:10px;padding:18px;margin-bottom:16px;">
-            <h3 style="margin:0 0 8px 0;">{{ rule.name }}</h3>
-            <p style="color:#666;">
-                Cycle: {{ rule.get_cycle_display }} |
-                Target: {{ rule.get_target_type_display }} |
-                Default Amount: {{ rule.default_amount|default:"-" }}
-            </p>
+    <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
 
-            <form method="POST" action="{% url 'generate_bills_from_rule' rule.pk %}" style="margin-top:14px;">
+        <!-- Rule Header -->
+        <div class="px-6 py-4 flex items-start justify-between gap-4">
+            <div class="flex items-start gap-4">
+                <div class="w-10 h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 mt-0.5">
+                    <i data-feather="credit-card" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-semibold text-slate-800">{{ rule.name }}</h3>
+                    <div class="flex flex-wrap items-center gap-3 mt-1.5">
+                        <span class="inline-flex items-center gap-1 text-xs text-slate-500">
+                            <i data-feather="refresh-cw" class="w-3 h-3"></i>
+                            {{ rule.get_cycle_display }}
+                        </span>
+                        <span class="inline-flex items-center gap-1 text-xs text-slate-500">
+                            <i data-feather="users" class="w-3 h-3"></i>
+                            {{ rule.get_target_type_display }}
+                        </span>
+                        {% if rule.default_amount %}
+                        <span class="inline-flex items-center gap-1 text-xs text-slate-500">
+                            <i data-feather="dollar-sign" class="w-3 h-3"></i>
+                            ฿{{ rule.default_amount }}
+                        </span>
+                        {% endif %}
+                        {% if rule.is_active %}
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">Active</span>
+                        {% else %}
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-500">Inactive</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Generate Bills Section -->
+        <div class="px-6 py-4 border-t border-slate-100 bg-slate-50">
+            <p class="text-xs font-medium text-slate-500 uppercase tracking-wide mb-3">Generate Bills</p>
+            <form method="POST" action="{% url 'generate_bills_from_rule' rule.pk %}">
                 {% csrf_token %}
-                <input type="number" name="billing_month" placeholder="Billing Month" min="1" max="12" style="padding:8px;">
-                <input type="number" name="billing_year" placeholder="Billing Year" style="padding:8px;">
-                <input type="date" name="due_date" style="padding:8px;">
-                <button type="submit" style="background:#2563eb;color:white;border:none;padding:9px 14px;border-radius:8px;">
-                    Generate Bills
-                </button>
+                <div class="flex flex-wrap items-end gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 mb-1">Billing Month</label>
+                        <input type="number" name="billing_month" placeholder="1 – 12" min="1" max="12"
+                               class="w-32 px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 mb-1">Billing Year</label>
+                        <input type="number" name="billing_year" placeholder="e.g. 2025"
+                               class="w-36 px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 mb-1">Due Date <span class="text-red-500">*</span></label>
+                        <input type="date" name="due_date"
+                               class="px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    </div>
+                    <button type="submit"
+                            class="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
+                        <i data-feather="zap" class="w-4 h-4"></i>
+                        Generate Bills
+                    </button>
+                </div>
             </form>
         </div>
-    {% empty %}
-        <p>No billing rules yet.</p>
+
+    </div>
     {% endfor %}
 </div>
+
+{% else %}
+<div class="bg-white rounded-xl shadow-sm border border-slate-100 py-16 text-center">
+    <i data-feather="file-text" class="w-12 h-12 mx-auto mb-3 text-slate-300"></i>
+    <p class="text-slate-500 font-medium">No billing rules yet.</p>
+    <p class="text-slate-400 text-sm mt-1">Create a rule to start generating bills automatically.</p>
+    <a href="{% url 'billing_rule_create' %}"
+       class="inline-flex items-center gap-2 mt-5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors">
+        <i data-feather="plus" class="w-4 h-4"></i>
+        Create Billing Rule
+    </a>
+</div>
+{% endif %}
+
 {% endblock %}

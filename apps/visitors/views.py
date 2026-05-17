@@ -126,3 +126,51 @@ def visitor_delete(request, pk):
         return redirect("visitor_list")
 
     return render(request, "visitors/visitor_confirm_delete.html", {"visitor": visitor})
+
+
+@login_required
+def visitor_accept(request, pk):
+    visitor = get_object_or_404(Visitor, pk=pk)
+    if request.user.role == "resident" and visitor.resident != request.user:
+        return HttpResponseForbidden("You cannot modify this visitor.")
+    
+    if request.method == "POST":
+        visitor.status = "accepted"
+        visitor.save()
+        messages.success(request, f"Visitor {visitor.name} has been accepted.")
+    
+    # Also support GET just in case, but prefer POST via forms
+    if request.method == "GET":
+        visitor.status = "accepted"
+        visitor.save()
+        messages.success(request, f"Visitor {visitor.name} has been accepted.")
+        
+    return redirect("visitor_list")
+
+
+@login_required
+def visitor_reject(request, pk):
+    visitor = get_object_or_404(Visitor, pk=pk)
+    if request.user.role == "resident" and visitor.resident != request.user:
+        return HttpResponseForbidden("You cannot modify this visitor.")
+    
+    if request.method == "POST" or request.method == "GET":
+        visitor.status = "rejected"
+        visitor.save()
+        messages.success(request, f"Visitor {visitor.name} has been rejected.")
+        
+    return redirect("visitor_list")
+
+
+@login_required
+def visitor_complete(request, pk):
+    visitor = get_object_or_404(Visitor, pk=pk)
+    if request.user.role == "resident" and visitor.resident != request.user:
+        return HttpResponseForbidden("You cannot modify this visitor.")
+    
+    if request.method == "POST" or request.method == "GET":
+        visitor.status = "completed"
+        visitor.save()
+        messages.success(request, f"Visitor {visitor.name} visit marked as complete.")
+        
+    return redirect("visitor_list")

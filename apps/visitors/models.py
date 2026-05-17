@@ -6,6 +6,8 @@ class Visitor(models.Model):
     STATUS_CHOICES = (
         ("expected", "Expected"),
         ("arrived", "Arrived"),
+        ("accepted", "Accepted"),
+        ("rejected", "Rejected"),
         ("completed", "Completed"),
     )
 

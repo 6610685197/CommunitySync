@@ -33,6 +33,12 @@
                     <span>Users</span>
                 </a>
                 {% endif %}
+                {% if request.user.role == 'resident' %}
+                <a href="{% url 'resident_dashboard' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800 transition-colors">
+                    <i data-feather="home" class="w-5 h-5 text-slate-400"></i>
+                    <span>Dashboard</span>
+                </a>
+                {% endif %}
                 <a href="{% url 'visitor_list' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800 transition-colors">
                     <i data-feather="user-check" class="w-5 h-5 text-slate-400"></i>
                     <span>Visitors</span>
@@ -44,6 +50,10 @@
                 <a href="{% url 'announcement_list' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800 transition-colors">
                     <i data-feather="bell" class="w-5 h-5 text-slate-400"></i>
                     <span>Announcements</span>
+                </a>
+                <a href="{% url 'facility_list' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800 transition-colors">
+                    <i data-feather="grid" class="w-5 h-5 text-slate-400"></i>
+                    <span>Facilities</span>
                 </a>
                 <a href="{% url 'bill_list' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-800 transition-colors">
                     <i data-feather="credit-card" class="w-5 h-5 text-slate-400"></i>
@@ -74,6 +84,13 @@
             </div>
             {% if request.user.is_authenticated %}
             <div class="flex items-center gap-3">
+                {% if request.user.role == "resident" %}
+                <a href="{% url 'link_account' %}"
+                   class="flex items-center gap-1.5 px-3 py-1.5 border border-slate-300 hover:bg-slate-50 text-slate-600 text-xs font-medium rounded-lg transition-colors">
+                    <i data-feather="link" class="w-3.5 h-3.5"></i>
+                    Link Account
+                </a>
+                {% endif %}
                 <div class="text-right hidden sm:block">
                     <p class="text-sm font-medium text-slate-700">{{ request.user.username }}</p>
                     <p class="text-xs text-slate-500 capitalize">{{ request.user.role }}</p>

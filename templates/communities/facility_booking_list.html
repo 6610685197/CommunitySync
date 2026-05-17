@@ -1,28 +1,96 @@
 {% extends "base.html" %}
 
+{% block title %}My Bookings{% endblock %}
+{% block page_title %}My Bookings{% endblock %}
+
 {% block content %}
-<div style="max-width:1000px;margin:30px auto;">
-    <h1>Facility Bookings</h1>
+<div class="mb-6 flex items-center justify-between">
+    <div>
+        <h1 class="text-2xl font-bold text-slate-800">Facility Bookings</h1>
+        <p class="text-slate-500 mt-1">
+            {% if request.user.role == "juristic" %}All facility bookings from residents.
+            {% else %}Your facility booking history.{% endif %}
+        </p>
+    </div>
+    {% if request.user.role == "resident" %}
+    <a href="{% url 'facility_list' %}"
+       class="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
+        <i data-feather="plus" class="w-4 h-4"></i>
+        New Booking
+    </a>
+    {% endif %}
+</div>
 
-    {% for booking in bookings %}
-        <div style="background:#fff;border:1px solid #ddd;border-radius:12px;padding:18px;margin-bottom:16px;">
-            <h3 style="margin-top:0;">{{ booking.facility_unit.facility.name }} - {{ booking.facility_unit.unit_name }}</h3>
-            <p><strong>Resident:</strong> {{ booking.resident.name|default:booking.resident.username }}</p>
-            <p><strong>Date:</strong> {{ booking.booking_date }}</p>
-            <p><strong>Time:</strong> {{ booking.start_time }} - {{ booking.end_time }}</p>
-            <p><strong>Status:</strong> {{ booking.get_status_display }}</p>
-            <p><strong>Note:</strong> {{ booking.note|default:"-" }}</p>
-
-            {% if request.user.role == "resident" or request.user.role == "juristic" %}
-                {% if booking.status != "cancelled" %}
-                    <a href="{% url 'facility_booking_cancel' booking.pk %}">Cancel Booking</a>
+<div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+    <table class="w-full text-sm">
+        <thead>
+            <tr class="bg-slate-50 border-b border-slate-200">
+                <th class="px-5 py-3 text-left font-semibold text-slate-600">Facility / Unit</th>
+                {% if request.user.role == "juristic" %}
+                <th class="px-5 py-3 text-left font-semibold text-slate-600">Resident</th>
                 {% endif %}
-            {% endif %}
-        </div>
-    {% empty %}
-        <div style="background:#fff;border:1px solid #ddd;border-radius:12px;padding:18px;">
-            No bookings found.
-        </div>
-    {% endfor %}
+                <th class="px-5 py-3 text-left font-semibold text-slate-600">Date</th>
+                <th class="px-5 py-3 text-left font-semibold text-slate-600">Time</th>
+                <th class="px-5 py-3 text-left font-semibold text-slate-600">Status</th>
+                <th class="px-5 py-3 text-left font-semibold text-slate-600">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+            {% for booking in bookings %}
+            <tr class="hover:bg-slate-50 transition-colors">
+                <td class="px-5 py-4">
+                    <p class="font-medium text-slate-800">{{ booking.facility_unit.facility.name }}</p>
+                    <p class="text-xs text-slate-400 mt-0.5">{{ booking.facility_unit.unit_name }}</p>
+                </td>
+                {% if request.user.role == "juristic" %}
+                <td class="px-5 py-4">
+                    <div class="flex items-center gap-2">
+                        <div class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-xs shrink-0">
+                            {{ booking.resident.username|make_list|first|upper }}
+                        </div>
+                        <span class="text-slate-700">{{ booking.resident.name|default:booking.resident.username }}</span>
+                    </div>
+                </td>
+                {% endif %}
+                <td class="px-5 py-4 text-slate-600">{{ booking.booking_date|date:"d M Y" }}</td>
+                <td class="px-5 py-4 text-slate-600">{{ booking.start_time|time:"H:i" }} – {{ booking.end_time|time:"H:i" }}</td>
+                <td class="px-5 py-4">
+                    {% if booking.status == "approved" %}
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">Approved</span>
+                    {% elif booking.status == "cancelled" %}
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-500">Cancelled</span>
+                    {% elif booking.status == "pending" %}
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700">Pending</span>
+                    {% else %}
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">{{ booking.get_status_display }}</span>
+                    {% endif %}
+                </td>
+                <td class="px-5 py-4">
+                    {% if booking.status != "cancelled" %}
+                    <a href="{% url 'facility_booking_cancel' booking.pk %}"
+                       class="text-red-500 hover:text-red-700 text-sm font-medium transition-colors">Cancel</a>
+                    {% else %}
+                    <span class="text-slate-300 text-sm">—</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="{% if request.user.role == 'juristic' %}6{% else %}5{% endif %}"
+                    class="px-5 py-12 text-center text-slate-400">
+                    <i data-feather="calendar" class="w-10 h-10 mx-auto mb-3 opacity-30"></i>
+                    <p class="font-medium">No bookings found</p>
+                    {% if request.user.role == "resident" %}
+                    <a href="{% url 'facility_list' %}"
+                       class="inline-flex items-center gap-1.5 mt-3 text-sm text-indigo-600 hover:text-indigo-800 font-medium transition-colors">
+                        <i data-feather="grid" class="w-4 h-4"></i>
+                        Browse facilities
+                    </a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 {% endblock %}

@@ -1,16 +1,55 @@
 {% extends "base.html" %}
 
-{% block content %}
-<div style="max-width:700px;margin:30px auto;">
-    <div style="background:#fff;border:1px solid #ddd;border-radius:12px;padding:24px;">
-        <h1>Delete Unit</h1>
-        <p>Are you sure you want to delete <strong>{{ unit.unit_name }}</strong>?</p>
+{% block title %}Delete Unit{% endblock %}
+{% block page_title %}Delete Unit{% endblock %}
 
-        <form method="POST">
-            {% csrf_token %}
-            <button type="submit" style="background:#dc2626;color:white;border:none;padding:10px 16px;border-radius:8px;">Delete</button>
-            <a href="{% url 'facility_unit_list' %}" style="margin-left:8px;">Cancel</a>
-        </form>
+{% block content %}
+<div class="max-w-lg mx-auto">
+
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-slate-800">Delete Unit</h1>
+        <p class="text-slate-500 mt-1">This action cannot be undone.</p>
     </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-100 bg-red-50">
+            <h2 class="text-base font-semibold text-red-700 flex items-center gap-2">
+                <i data-feather="alert-triangle" class="w-4 h-4"></i>
+                Confirm Deletion
+            </h2>
+        </div>
+        <div class="p-6 space-y-4">
+
+            <div class="flex items-center gap-3 px-5 py-4 bg-slate-50 border border-slate-100 rounded-xl">
+                <div class="w-9 h-9 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0">
+                    <i data-feather="layers" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-medium text-slate-400 uppercase tracking-wide">Unit</p>
+                    <p class="text-sm font-semibold text-slate-800">{{ unit.unit_name }}</p>
+                </div>
+            </div>
+
+            <p class="text-sm text-slate-600">
+                Are you sure you want to delete <strong class="text-slate-800">{{ unit.unit_name }}</strong>?
+                All associated data will be permanently removed.
+            </p>
+
+            <form method="POST" class="flex items-center gap-3 pt-2">
+                {% csrf_token %}
+                <button type="submit"
+                        class="flex items-center gap-2 px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
+                    <i data-feather="trash-2" class="w-4 h-4"></i>
+                    Delete Unit
+                </button>
+                <a href="{% url 'facility_unit_list' %}"
+                   class="px-5 py-2.5 border border-slate-300 hover:bg-slate-50 text-slate-700 text-sm font-medium rounded-lg transition-colors">
+                    Cancel
+                </a>
+            </form>
+
+        </div>
+    </div>
+
 </div>
 {% endblock %}

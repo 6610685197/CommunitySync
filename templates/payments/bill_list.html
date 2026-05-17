@@ -1,50 +1,103 @@
 {% extends "base.html" %}
 
+{% block title %}Bills{% endblock %}
+{% block page_title %}Bills{% endblock %}
+
 {% block content %}
-<div style="max-width:1100px;margin:30px auto;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-        <h1 style="margin:0;">Bills</h1>
-
-        {% if request.user.role == "juristic" %}
-            <div>
-                <a href="{% url 'bill_create' %}" style="background:#2563eb;color:white;text-decoration:none;padding:10px 14px;border-radius:8px;">+ Create Bill</a>
-                <a href="{% url 'billing_rule_list' %}" style="background:#7c3aed;color:white;text-decoration:none;padding:10px 14px;border-radius:8px;margin-left:8px;">Billing Rules</a>
-            </div>
-        {% endif %}
+<div class="mb-6 flex items-center justify-between">
+    <div>
+        <h1 class="text-2xl font-bold text-slate-800">Bills</h1>
+        <p class="text-slate-500 mt-1">
+            {% if request.user.role == "juristic" %}Manage all resident bills.{% else %}Your outstanding and past bills.{% endif %}
+        </p>
     </div>
+    {% if request.user.role == "juristic" %}
+    <div class="flex items-center gap-2">
+        <a href="{% url 'billing_rule_list' %}"
+           class="flex items-center gap-2 px-4 py-2 border border-slate-300 hover:bg-slate-50 text-slate-700 text-sm font-medium rounded-lg transition-colors">
+            <i data-feather="sliders" class="w-4 h-4"></i>
+            Billing Rules
+        </a>
+        <a href="{% url 'bill_create' %}"
+           class="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
+            <i data-feather="plus" class="w-4 h-4"></i>
+            Create Bill
+        </a>
+    </div>
+    {% endif %}
+</div>
 
-    {% for bill in bills %}
-        <div style="background:#fff;border:1px solid #ddd;border-radius:10px;padding:18px;margin-bottom:16px;">
-            <h2 style="margin-top:0;">
-                <a href="{% url 'bill_detail' bill.pk %}" style="text-decoration:none;color:#111;">
-                    {{ bill.title }}
-                </a>
-            </h2>
-
-            <p style="color:#666;">
-                Name: {{ bill.name }} |
-                Amount: {{ bill.amount }} |
-                Due: {{ bill.due_date }} |
-                Status: {{ bill.get_status_display }}
-            </p>
-
-            {% if request.user.role == "juristic" %}
-                <p style="color:#666;">
-                    Resident: {{ bill.resident.name|default:bill.resident.username }}
-                </p>
-            {% endif %}
-
-            <a href="{% url 'bill_detail' bill.pk %}">View Detail</a>
-
-            {% if request.user.role == "juristic" %}
-                | <a href="{% url 'bill_update' bill.pk %}">Edit</a>
-                | <a href="{% url 'bill_delete' bill.pk %}">Delete</a>
-            {% endif %}
-        </div>
-    {% empty %}
-        <div style="background:#fff;border:1px solid #ddd;border-radius:10px;padding:18px;">
-            No bills found.
-        </div>
-    {% endfor %}
+<div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+    <table class="w-full text-sm">
+        <thead>
+            <tr class="bg-slate-50 border-b border-slate-200">
+                <th class="px-5 py-3 text-left font-semibold text-slate-600">Title</th>
+                {% if request.user.role == "juristic" %}
+                <th class="px-5 py-3 text-left font-semibold text-slate-600">Resident</th>
+                {% endif %}
+                <th class="px-5 py-3 text-left font-semibold text-slate-600">Amount</th>
+                <th class="px-5 py-3 text-left font-semibold text-slate-600">Due Date</th>
+                <th class="px-5 py-3 text-left font-semibold text-slate-600">Status</th>
+                <th class="px-5 py-3 text-left font-semibold text-slate-600">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+            {% for bill in bills %}
+            <tr class="hover:bg-slate-50 transition-colors">
+                <td class="px-5 py-4">
+                    <a href="{% url 'bill_detail' bill.pk %}" class="font-medium text-slate-800 hover:text-indigo-600 transition-colors">
+                        {{ bill.title }}
+                    </a>
+                    {% if bill.name %}
+                    <p class="text-xs text-slate-400 mt-0.5">{{ bill.name }}</p>
+                    {% endif %}
+                </td>
+                {% if request.user.role == "juristic" %}
+                <td class="px-5 py-4">
+                    <div class="flex items-center gap-2">
+                        <div class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-xs shrink-0">
+                            {{ bill.resident.username|make_list|first|upper }}
+                        </div>
+                        <span class="text-slate-700">{{ bill.resident.name|default:bill.resident.username }}</span>
+                    </div>
+                </td>
+                {% endif %}
+                <td class="px-5 py-4 font-medium text-slate-800">฿{{ bill.amount }}</td>
+                <td class="px-5 py-4 text-slate-600">{{ bill.due_date }}</td>
+                <td class="px-5 py-4">
+                    {% if bill.status == "paid" %}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">Paid</span>
+                    {% elif bill.status == "unpaid" %}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">Unpaid</span>
+                    {% elif bill.status == "pending_review" %}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700">Pending Review</span>
+                    {% elif bill.status == "overdue" %}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-700">Overdue</span>
+                    {% elif bill.status == "rejected" %}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700">Rejected</span>
+                    {% else %}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">{{ bill.get_status_display }}</span>
+                    {% endif %}
+                </td>
+                <td class="px-5 py-4">
+                    <div class="flex items-center gap-3">
+                        <a href="{% url 'bill_detail' bill.pk %}" class="text-indigo-600 hover:text-indigo-800 font-medium transition-colors">View</a>
+                        {% if request.user.role == "juristic" %}
+                        <a href="{% url 'bill_update' bill.pk %}" class="text-slate-500 hover:text-slate-700 transition-colors">Edit</a>
+                        <a href="{% url 'bill_delete' bill.pk %}" class="text-red-500 hover:text-red-700 transition-colors">Delete</a>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="{% if request.user.role == 'juristic' %}6{% else %}5{% endif %}" class="px-5 py-12 text-center text-slate-400">
+                    <i data-feather="credit-card" class="w-10 h-10 mx-auto mb-3 opacity-30"></i>
+                    <p class="font-medium">No bills found</p>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 {% endblock %}

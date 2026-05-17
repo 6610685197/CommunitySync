@@ -80,21 +80,21 @@
     <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
         <h3 class="text-lg font-semibold text-slate-800 mb-4">Quick Actions</h3>
         <div class="grid grid-cols-2 gap-3">
-            <a href="{% url 'create_account' %}" class="flex flex-col items-center justify-center p-4 rounded-lg border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50 transition-colors text-center">
-                <i data-feather="user-plus" class="w-6 h-6 text-indigo-500 mb-2"></i>
-                <span class="text-sm font-medium text-slate-700">New Account</span>
+            <a href="{% url 'user_list' %}" class="flex flex-col items-center justify-center p-4 rounded-lg border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50 transition-colors text-center">
+                <i data-feather="users" class="w-6 h-6 text-indigo-500 mb-2"></i>
+                <span class="text-sm font-medium text-slate-700">Accounts</span>
             </a>
-            <a href="{% url 'visitor_create' %}" class="flex flex-col items-center justify-center p-4 rounded-lg border border-slate-200 hover:border-emerald-300 hover:bg-emerald-50 transition-colors text-center">
+            <a href="{% url 'visitor_list' %}" class="flex flex-col items-center justify-center p-4 rounded-lg border border-slate-200 hover:border-emerald-300 hover:bg-emerald-50 transition-colors text-center">
                 <i data-feather="user-check" class="w-6 h-6 text-emerald-500 mb-2"></i>
-                <span class="text-sm font-medium text-slate-700">Add Visitor</span>
+                <span class="text-sm font-medium text-slate-700">Visitors</span>
             </a>
-            <a href="{% url 'announcement_create' %}" class="flex flex-col items-center justify-center p-4 rounded-lg border border-slate-200 hover:border-amber-300 hover:bg-amber-50 transition-colors text-center">
+            <a href="{% url 'announcement_list' %}" class="flex flex-col items-center justify-center p-4 rounded-lg border border-slate-200 hover:border-amber-300 hover:bg-amber-50 transition-colors text-center">
                 <i data-feather="bell" class="w-6 h-6 text-amber-500 mb-2"></i>
-                <span class="text-sm font-medium text-slate-700">Announcement</span>
+                <span class="text-sm font-medium text-slate-700">Announcements</span>
             </a>
-            <a href="{% url 'facility_create' %}" class="flex flex-col items-center justify-center p-4 rounded-lg border border-slate-200 hover:border-purple-300 hover:bg-purple-50 transition-colors text-center">
+            <a href="{% url 'facility_list' %}" class="flex flex-col items-center justify-center p-4 rounded-lg border border-slate-200 hover:border-purple-300 hover:bg-purple-50 transition-colors text-center">
                 <i data-feather="grid" class="w-6 h-6 text-purple-500 mb-2"></i>
-                <span class="text-sm font-medium text-slate-700">Add Facility</span>
+                <span class="text-sm font-medium text-slate-700">Facilities</span>
             </a>
         </div>
     </div>

@@ -1,26 +1,65 @@
 {% extends "base.html" %}
 
+{% block title %}Facility Units{% endblock %}
+{% block page_title %}Facility Units{% endblock %}
+
 {% block content %}
-<div style="max-width:1000px;margin:30px auto;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-        <h1 style="margin:0;">Facility Units</h1>
-        <a href="{% url 'facility_list' %}" style="background:#16a34a;color:white;text-decoration:none;padding:10px 14px;border-radius:8px;">+ Add Unit</a>
+<div class="mb-6 flex items-center justify-between">
+    <div>
+        <h1 class="text-2xl font-bold text-slate-800">Facility Units</h1>
+        <p class="text-slate-500 mt-1">Manage bookable units across all facilities.</p>
     </div>
+    <a href="{% url 'facility_list' %}"
+       class="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
+        <i data-feather="plus" class="w-4 h-4"></i>
+        Add Unit
+    </a>
+</div>
 
-    {% for unit in units %}
-        <div style="background:#fff;border:1px solid #ddd;border-radius:12px;padding:18px;margin-bottom:16px;">
-            <h3 style="margin-top:0;">{{ unit.unit_name }}</h3>
-            <p><strong>Facility:</strong> {{ unit.facility.name }}</p>
-            <p><strong>Status:</strong> {{ unit.get_status_display }}</p>
-            <p><strong>Note:</strong> {{ unit.note|default:"-" }}</p>
-
-            <a href="{% url 'facility_unit_update' unit.pk %}">Edit</a>
-            | <a href="{% url 'facility_unit_delete' unit.pk %}">Delete</a>
-        </div>
-    {% empty %}
-        <div style="background:#fff;border:1px solid #ddd;border-radius:12px;padding:18px;">
-            No units found.
-        </div>
-    {% endfor %}
+<div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+    <table class="w-full text-sm">
+        <thead>
+            <tr class="bg-slate-50 border-b border-slate-200">
+                <th class="px-5 py-3 text-left font-semibold text-slate-600">Unit Name</th>
+                <th class="px-5 py-3 text-left font-semibold text-slate-600">Facility</th>
+                <th class="px-5 py-3 text-left font-semibold text-slate-600">Status</th>
+                <th class="px-5 py-3 text-left font-semibold text-slate-600">Note</th>
+                <th class="px-5 py-3 text-left font-semibold text-slate-600">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+            {% for unit in units %}
+            <tr class="hover:bg-slate-50 transition-colors">
+                <td class="px-5 py-4 font-medium text-slate-800">{{ unit.unit_name }}</td>
+                <td class="px-5 py-4 text-slate-600">{{ unit.facility.name }}</td>
+                <td class="px-5 py-4">
+                    {% if unit.status == "available" %}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">Available</span>
+                    {% elif unit.status == "unavailable" %}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700">Unavailable</span>
+                    {% else %}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">{{ unit.get_status_display }}</span>
+                    {% endif %}
+                </td>
+                <td class="px-5 py-4 text-slate-500">{{ unit.note|default:"—" }}</td>
+                <td class="px-5 py-4">
+                    <div class="flex items-center gap-3">
+                        <a href="{% url 'facility_unit_update' unit.pk %}"
+                           class="text-indigo-600 hover:text-indigo-800 font-medium transition-colors">Edit</a>
+                        <a href="{% url 'facility_unit_delete' unit.pk %}"
+                           class="text-red-500 hover:text-red-700 font-medium transition-colors">Delete</a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="px-5 py-12 text-center text-slate-400">
+                    <i data-feather="layers" class="w-10 h-10 mx-auto mb-3 opacity-30"></i>
+                    <p class="font-medium">No units found</p>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 {% endblock %}

@@ -1,6 +1,6 @@
 # Community Sync
 
-<img src="https://mobile-yellow-1qhk1uwpbl.edgeone.app/m.png" width="66%">
+<a href="https://ibb.co/ks0vyxWp"><img src="https://i.ibb.co/39WQs7Lw/m.png" alt="m" border="0" /></a>
 
 Community Sync is a web-based system for managing residential communities and shared living environments.
 It helps administrators and residents handle daily tasks like payments, maintenance requests, visitor management, and announcements in one central platform.
@@ -16,6 +16,8 @@ It helps administrators and residents handle daily tasks like payments, maintena
 | **Class Diagram & Use Case Diagram** | [View Design](https://www.canva.com/design/DAG_a7sKqwI/QwEKfDcEVnArt9FyxP7TMA/view?utm_content=DAG_a7sKqwI&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h2136b7eadc) |
 | **GUI**                              | [View Design](https://www.canva.com/design/DAHAG_V67dk/fxANwvrXrMlwq5FdAlIxeA/view?utm_content=DAHAG_V67dk&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h2b51a5388b) |
 | **Mapping & Facade**                 | [View Design](https://www.canva.com/design/DAHAp-KGA5c/vj0y5XMaq16o13piXvbcgw/view?utm_content=DAHAp-KGA5c&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h34d8343fc2) |
+| **Implement Plan & Progress**        | [View Design](https://www.canva.com/design/DAHH8dMvc8g/0HAyVIIFE8c1zvDEjueHSQ/view?utm_content=DAHH8dMvc8g&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h9cd0e8ddfa) |
+| **Final Presentation**               | [View Design](https://canva.link/y1y7mv0geg4n3jo)                                                                                                                                              |
 
 <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/cut.png" width="100%">
 
@@ -71,7 +73,7 @@ Instead of relying on multiple tools such as paper notices, chat applications, o
 * Residents can reserve common areas and facilities
 * Check facility status
 
-### Security & Access Control
+### Security & Access Control (In Progress)
 * Residents can view CCTV in their neighborhood
 * Automated License Plate Recognition for residents allowing entry without scanning a card 
 * Automated barrier gate control via AI Camera 
@@ -81,9 +83,9 @@ Instead of relying on multiple tools such as paper notices, chat applications, o
 ## Tech Stack
 
 ### Frontend
-HTML, CSS, JavaScript
+HTML, CSS
 
-![HTML5](https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white) ![CSS3](https://img.shields.io/badge/css3-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white) ![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)
+![HTML5](https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white) ![CSS3](https://img.shields.io/badge/css3-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white) 
 
 ### Backend
 Python (Django)
@@ -91,9 +93,9 @@ Python (Django)
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54) ![Django](https://img.shields.io/badge/django-%23092E20.svg?style=for-the-badge&logo=django&logoColor=white)
 
 ### Database
-SQLite / MySQL , supabase
+SQLite, supabase
 
-![SQLite](https://img.shields.io/badge/sqlite-%2307405e.svg?style=for-the-badge&logo=sqlite&logoColor=white) ![MySQL](https://img.shields.io/badge/mysql-%2300f.svg?style=for-the-badge&logo=mysql&logoColor=white) ![supabase](https://img.shields.io/badge/supabase-white?style=for-the-badge&logo=supabase&color=white)
+![SQLite](https://img.shields.io/badge/sqlite-%2307405e.svg?style=for-the-badge&logo=sqlite&logoColor=white) ![supabase](https://img.shields.io/badge/supabase-white?style=for-the-badge&logo=supabase&color=white)
 
 ### Tools
 Git, GitHub, Canva

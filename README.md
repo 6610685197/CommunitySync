@@ -27,10 +27,15 @@ Instead of relying on multiple tools such as paper notices, chat applications, o
 
 <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/cut.png" width="100%">
 
-## Users
-* Juristic Person
-* Residents
-* Security Staff
+## Demo Account Credentials
+
+Use the following demo accounts to access and test each user role in the system.
+
+| Role | Username | Password |
+| :--- | :--- | :--- |
+| Security Staff | `security1` | `yarm1234` |
+| Juristic Person | `juristic1` | `admin12345` |
+| Resident | `resident1` | `pass12345` |
 
 <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/cut.png" width="100%">
 

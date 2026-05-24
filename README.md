@@ -27,6 +27,40 @@ Instead of relying on multiple tools such as paper notices, chat applications, o
 
 <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/cut.png" width="100%">
 
+## How to run this project
+
+Clone the Repository and add .env from microsoft teams
+```bash
+git clone https://github.com/6610685197/CommunitySync.git
+cd CommunitySync
+```
+Setup Virtual Environment (Recommended)
+```bash
+# Create the environment
+python -m venv venv
+
+# Activate it
+# On Windows:
+venv\Scripts\activate
+# On macOS/Linux:
+source venv/bin/activate
+```
+Install Dependencies
+```bash
+pip install -r requirements.txt
+```
+Database Migrations
+```bash
+python manage.py migrate
+```
+Run the Development Server
+```bash
+python manage.py runserver
+```
+Once the server is running, navigate to http://127.0.0.1:8000/ in your browser.
+
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/cut.png" width="100%">
+
 ## Demo Account Credentials
 
 Use the following demo accounts to access and test each user role in the system.
